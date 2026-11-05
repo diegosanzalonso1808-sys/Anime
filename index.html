@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Animeteca · Mi estantería de anime</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1e;--panel:#121a30;--panel2:#1a2442;--ink:#e9edf7;--mute:#8d99b5;--bd:rgba(255,255,255,.11);--ac:#7c5cff;--ac2:#ff5c8a;--paper:#0a0f1e;--tone:rgba(255,255,255,.09);--seal:#ff5c8a;--br:.6;color-scheme:dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef0f7;--panel:#fff;--panel2:#f1f3fa;--ink:#141a2e;--mute:#5d6682;--bd:rgba(20,26,46,.14);--paper:#eef0f7;--tone:rgba(20,26,46,.08);--br:1;color-scheme:light}}
+:root[data-theme="light"]{--bg:#eef0f7;--panel:#fff;--panel2:#f1f3fa;--ink:#141a2e;--mute:#5d6682;--bd:rgba(20,26,46,.14);--paper:#eef0f7;--tone:rgba(20,26,46,.08);--br:1;color-scheme:light}
+*{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:300 15px/1.5 "Zen Kaku Gothic New",system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);z-index:41}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac2);outline-offset:2px}
+[hidden]{display:none!important}
+/* fondo manga */
+#bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--bg);--mx:70%;--my:30%;--px:0;--py:0}
+#bg::after{content:"";position:absolute;inset:0;z-index:3;background:color-mix(in srgb,var(--bg) var(--veil,64%),transparent)}
+.lay{position:absolute;inset:-3%;transform:translate(calc(var(--px)*-18px),calc(var(--py)*-12px)) scale(1.04);transition:transform .25s ease-out}
+.lay svg{width:100%;height:100%;display:block}
+.blur{filter:blur(4px) grayscale(1) brightness(var(--br))}.sharp{filter:brightness(var(--br))}
+.lens{position:absolute;inset:0;-webkit-mask-image:radial-gradient(circle 210px at var(--mx) var(--my),#000 0,rgba(0,0,0,.65) 55%,transparent 100%);mask-image:radial-gradient(circle 210px at var(--mx) var(--my),#000 0,rgba(0,0,0,.65) 55%,transparent 100%)}
+.tint{position:absolute;inset:0;mix-blend-mode:multiply;background:linear-gradient(115deg,#ff9ab5,#ffd36b 35%,#7fd6c8 65%,#7aa7ff)}
+.rain{position:absolute;inset:0;z-index:2;background:linear-gradient(97deg,transparent 45%,rgba(255,255,255,.5) 50%,transparent 55%) 0 0/14px 80px;animation:rn 1s linear infinite;-webkit-mask-image:linear-gradient(#000,transparent 50%);mask-image:linear-gradient(#000,transparent 50%);opacity:.5}
+@keyframes rn{to{background-position:0 80px}}
+/* barra superior */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap;padding:10px max(16px,calc((100% - 1320px)/2 + 16px));background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.logo{display:flex;align-items:baseline;gap:8px;font:400 24px "Shippori Mincho",serif;letter-spacing:.16em}.logo small{color:var(--ac2);font-size:16px}
+.menu{display:flex;gap:4px;flex-wrap:wrap}
+.menu button{background:none;border:0;padding:6px 14px;border-radius:999px;cursor:pointer;color:var(--mute);font-weight:400}
+.menu button[aria-pressed=true]{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
+.sw{position:relative;flex:1;min-width:150px;max-width:380px;margin-left:auto}
+.sw input{width:100%;background:var(--panel);border:1px solid var(--bd);border-radius:999px;padding:7px 14px}
+#res{position:absolute;z-index:50;left:0;right:0;top:calc(100% + 6px);background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:8px;display:none;flex-wrap:wrap;gap:6px}#res.on{display:flex}
+.rt{display:flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:10px 10px 0 0;border-bottom:2px solid var(--ac2);background:var(--panel2);padding:2px 10px 2px 3px;font-size:12px;cursor:pointer;max-width:100%}
+.rt img,.rt i{width:20px;height:26px;object-fit:cover;background:var(--tone);display:block;flex:none;border-radius:3px}.rt em{font-style:normal;color:var(--ac2);font-size:11px}
+.none{font-size:13px;color:var(--mute)}
+.cta{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:0;border-radius:999px;padding:7px 18px;cursor:pointer;font-weight:500}
+.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 18px;cursor:pointer}
+.ic{border:1px solid var(--bd);background:var(--panel);border-radius:50%;width:34px;height:34px;cursor:pointer}
+.wrap{max-width:1320px;margin:0 auto;padding:18px 16px 80px}
+.sec{font:400 clamp(22px,3vw,30px)/1.2 "Shippori Mincho",serif;margin:26px 0 12px;letter-spacing:.06em}.sec small{font:300 13px "Zen Kaku Gothic New";color:var(--mute);letter-spacing:0}
+.hint{color:var(--mute);font-size:13px;margin:0 0 10px}
+/* hero */
+.hero{position:relative;height:clamp(210px,30vw,320px);border-radius:18px;overflow:hidden;border:1px solid var(--bd);background:var(--panel)}
+.hs{position:absolute;inset:0;opacity:0;transition:opacity .7s;pointer-events:none;color:#fff}.hs.on{opacity:1;pointer-events:auto}
+.hb{position:absolute;inset:0;background:linear-gradient(135deg,hsl(var(--h,260) 70% 40%),hsl(calc(var(--h,260) + 60) 70% 25%)) center/cover;filter:blur(16px) brightness(.55) saturate(1.3);transform:scale(1.25)}
+.hs::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(8,12,26,.85),transparent 70%)}
+.hc{position:absolute;z-index:2;left:clamp(16px,4vw,44px);top:50%;transform:translateY(-50%);max-width:min(560px,62%);display:flex;flex-direction:column;gap:8px}
+.tg{font-size:12px;letter-spacing:.14em;color:#ffd0dd}
+.hc h2{font:400 clamp(24px,4.4vw,46px)/1.1 "Shippori Mincho",serif;margin:0}.hc p{margin:0;font-size:14px;opacity:.9}
+.hbt{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.hp{position:absolute;z-index:2;right:clamp(16px,5vw,60px);top:50%;transform:translateY(-50%) rotate(3deg);height:78%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.4)}
+.ph0{display:grid;place-items:center;font:400 64px "Shippori Mincho",serif;background:hsl(var(--h) 60% 30%)}
+.hd{position:absolute;z-index:3;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:6px}
+.hd button{width:8px;height:8px;border-radius:50%;border:0;background:rgba(255,255,255,.4);cursor:pointer;padding:0}.hd button.on{background:#fff;width:22px;border-radius:6px}
+@media (max-width:620px){.hp{display:none}.hc{max-width:88%}}
+/* stats / barra */
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.stat{flex:1;min-width:110px;background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:8px 14px}
+.stat b{display:block;font:400 26px/1.1 "Shippori Mincho",serif}.stat span{font-size:12px;color:var(--mute)}
+.stat span::before{color:var(--ac2);font-family:"Shippori Mincho",serif;margin-right:5px;font-size:14px}
+.stat:nth-child(1) span::before{content:"全"}.stat:nth-child(2) span::before{content:"完"}.stat:nth-child(3) span::before{content:"視"}.stat:nth-child(4) span::before{content:"話"}.stat:nth-child(5) span::before{content:"時"}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.tab{border:1px solid var(--bd);background:var(--panel);border-radius:999px;padding:5px 14px;cursor:pointer;font-size:13px;transition:transform .15s}.tab:hover{transform:translateY(-2px)}
+.tab[aria-pressed=true]{background:var(--ac);border-color:var(--ac);color:#fff}
+select.sm{background:var(--panel2);border:1px solid var(--bd);border-radius:8px;padding:4px 6px;font-size:12px}
+.roll{background:linear-gradient(135deg,var(--ac2),#ffb15c);color:#1a0a14;border:0;border-radius:999px;padding:6px 16px;cursor:pointer;font-weight:500}
+/* tarjetas */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;align-items:start}
+.pc{--hc:hsl(var(--h,0) 70% 55%);position:relative;background:var(--panel);border:1px solid var(--bd);border-radius:14px;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease,border-color .25s}
+.pc:hover{transform:translateY(-6px) scale(1.04);box-shadow:0 20px 40px -14px rgba(0,0,0,.65);border-color:var(--hc);z-index:3}
+.pc.flash{animation:fl 1.4s}.pc.hl{outline:3px solid var(--ac2);outline-offset:2px}.pc.win{animation:win .9s 3}
+@keyframes fl{0%,60%{outline:4px solid var(--ac2);outline-offset:3px}100%{outline:4px solid transparent}}
+@keyframes win{50%{transform:scale(1.08);box-shadow:0 0 40px var(--ac2)}}
+.pz{position:relative;aspect-ratio:2/3;overflow:hidden;background:linear-gradient(160deg,hsl(var(--h,0) 65% 38%),hsl(calc(var(--h,0) + 50) 60% 22%))}
+.pz img{width:100%;height:100%;object-fit:cover;display:block}
+.ph{position:absolute;inset:0;width:100%;border:0;background:radial-gradient(rgba(255,255,255,.18) 20%,transparent 22%) 0 0/8px 8px;cursor:pointer;display:grid;place-items:center;align-content:center;color:#fff}
+.ph b{font:400 64px "Shippori Mincho",serif}.ph small{font-size:11px;opacity:.8}
+.pz::after{content:"";position:absolute;inset:auto 0 0;height:60%;background:linear-gradient(transparent,rgba(5,8,18,.92));pointer-events:none}
+.b1,.b2{position:absolute;top:8px;z-index:2;font-size:11px;font-weight:500;padding:2px 9px;border-radius:999px;color:#fff;backdrop-filter:blur(6px)}
+.b1{left:8px;background:var(--ac)}.b2{right:8px;background:rgba(0,0,0,.6)}.b2::before{content:"⏱ "}.b2.ok{background:var(--ac2)}.b2.ok::before{content:""}
+.pt{position:absolute;z-index:2;left:10px;right:34px;bottom:9px;color:#fff;pointer-events:none}
+.pt h3{font:500 15px/1.25 "Zen Kaku Gothic New";margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pt small{font-size:11px;opacity:.8}
+.hv{position:absolute;z-index:3;right:6px;bottom:6px;border:0;background:none;font-size:20px;color:#fff;cursor:pointer;padding:2px 4px}.hv.on{color:var(--ac2)}
+.hv.delbtn{right:6px;bottom:36px;font-size:14px;color:#ff8aa5;opacity:.75}
+.hv.delbtn:hover{opacity:1}
+.hv.delbtn.arm{background:var(--ac2);color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;line-height:1}
+.bd{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.sl-row{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}.pc2{color:var(--hc);font-weight:500}
+.sl{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;margin:-4px 0;cursor:pointer}
+.sl::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(to right,var(--hc) var(--pc,0%),var(--tone) var(--pc,0%))}
+.sl::-moz-range-track{height:6px;border-radius:6px;background:linear-gradient(to right,var(--hc) var(--pc,0%),var(--tone) var(--pc,0%))}
+.sl::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-5px;border-radius:50%;background:#fff;border:3px solid var(--hc)}
+.sl::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:#fff;border:3px solid var(--hc)}
+.nr{display:flex;gap:6px}
+.next{flex:1;display:flex;justify-content:space-between;align-items:center;background:var(--hc);color:#fff;border:0;border-radius:10px;padding:7px 10px;cursor:pointer;font-weight:500;font-size:13px;position:relative;overflow:hidden}
+.next b{font:400 18px "Shippori Mincho",serif}.next:active{transform:translateY(2px)}
+.next::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg);transition:left .5s}.next:hover::after{left:120%}
+.prev{border:1px solid var(--bd);background:var(--panel2);border-radius:10px;padding:0 10px;cursor:pointer;font-size:12px;white-space:nowrap}.prev:disabled{opacity:.35;cursor:default}
+.fin{flex:1;text-align:center;padding:7px;border:1px dashed var(--bd);border-radius:10px;font-size:13px}
+.sel{display:flex;gap:6px}.sel select{flex:1;min-width:0}
+.rv,.nm,.dt,.fields input,.fields select,.fields textarea{background:var(--panel2);border:1px solid var(--bd);border-radius:8px;padding:4px 8px}
+.rv{width:100%;font-size:12px}
+.sh{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-top:8px;gap:6px;flex-wrap:wrap}.sh b{font-weight:500}
+.nm{width:58px}.ln{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:8px;flex-wrap:wrap}.dt{flex:1;min-width:0}
+.ln input[type=range]{flex:1;min-width:70px;accent-color:var(--hc)}
+/* ===== EPISODIOS EN GRID (FILAS Y COLUMNAS) ===== */
+.eps{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(38px,1fr));
+  gap:5px;
+  padding:8px;
+  background:var(--panel2);
+  border-radius:10px;
+  max-height:160px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:var(--hc) transparent;
+}
+.eps::-webkit-scrollbar{width:6px}
+.eps::-webkit-scrollbar-thumb{background:var(--hc);border-radius:4px}
+.ep{
+  width:100%;
+  aspect-ratio:1;
+  font-size:12px;
+  font-weight:500;
+  border-radius:9px;
+  background:var(--panel);
+  border:1px solid var(--bd);
+  color:var(--ink);
+  transition:transform .12s,background .2s;
+  cursor:pointer;
+  padding:0;
+}
+.ep:hover{transform:scale(1.08);border-color:var(--hc)}
+.ep.on{background:linear-gradient(135deg,var(--hc),color-mix(in srgb,var(--hc) 60%,#000));color:#fff;border-color:transparent;box-shadow:0 3px 10px -3px var(--hc)}
+.ep.on::after{content:"✓";font-size:9px;position:relative;top:-8px;left:3px;opacity:.9}
+/* ===== PORTADA POR TEMPORADA ===== */
+.season-cover{
+  width:40px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--bd);flex-shrink:0;
+}
+.season-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.season-header b{font-size:13px}
+.season-header .tnm{color:var(--hc);font-weight:500}
+/* ===== TABS ===== */
+.tabs2{display:flex;gap:4px;margin-top:8px;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.t2{flex:1;min-width:60px;background:none;border:0;padding:6px 4px;border-radius:8px 8px 0 0;font-size:12px;cursor:pointer;color:var(--mute)}
+.t2[aria-pressed=true]{background:var(--panel2);color:var(--ink);font-weight:500;border-bottom:2px solid var(--hc)}
+.tabpanel{padding:8px 4px;font-size:12px;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+/* ===== SINOPSIS (3 LÍNEAS MÁXIMO) ===== */
+.syn{
+  white-space:normal;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-height:none;
+  margin:0;
+}
+/* calendario, tier, modales, etc. */
+.cal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.dy{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:8px;min-height:120px}.dy.today{border-color:var(--ac2)}
+.dy h3{font:400 14px "Shippori Mincho",serif;margin:0 0 6px;text-transform:capitalize}
+.cal2{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}.sub{font:400 18px "Shippori Mincho",serif;margin:18px 0 8px}
+.ci{display:flex;gap:8px;background:var(--panel2);border-radius:10px;padding:6px;margin-bottom:6px;font-size:12px}
+.ci img,.ci i{width:36px;height:52px;object-fit:cover;border-radius:5px;flex:none;background:hsl(var(--h,0) 60% 35%);display:grid;place-items:center;font:400 20px "Shippori Mincho",serif;font-style:normal;color:#fff}
+.ci div{min-width:0}.ci b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ci small{display:block;color:var(--mute)}.ci [data-cd]{color:var(--ac2)}
+.ca{display:flex;gap:8px;margin-top:2px}
+/* tier list */
+.th{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tiersec h2{font:400 clamp(24px,4vw,34px)/1.2 "Shippori Mincho",serif;margin:10px 0 4px}
+.tr{display:flex;border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-top:8px;background:var(--panel);min-height:86px}
+.tl{width:92px;flex:none;display:grid;place-items:center;align-content:center;font:500 34px "Shippori Mincho",serif;color:#fff;text-align:center;padding:4px;overflow-wrap:anywhere;line-height:1.1}
+.pool .tl{background:var(--tone);color:var(--ink);font-size:24px}.tl small{display:block;font:300 10px "Zen Kaku Gothic New"}
+.tz{flex:1;display:flex;flex-wrap:wrap;gap:6px;padding:6px;align-content:flex-start;min-height:80px}
+.tr.over{outline:2px dashed var(--ac2);outline-offset:-3px}
+.chip{width:62px;cursor:grab;text-align:center;font-size:10px;line-height:1.2;border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:var(--panel2);transition:transform .15s;user-select:none}
+.chip img,.chip b{display:grid;place-items:center;width:100%;height:78px;object-fit:cover;font:400 34px "Shippori Mincho",serif;background:hsl(var(--h,0) 60% 32%);color:#fff}
+.chip span{display:block;padding:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip:hover{transform:translateY(-4px)}.chip.sel{outline:3px solid var(--ac2)}.chip.drag{opacity:.4}
+.tnew{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0;border:1px dashed var(--bd);border-radius:12px;padding:8px}
+.tnew #tnN{flex:1;min-width:150px;background:var(--panel2);border:1px solid var(--bd);border-radius:8px;padding:5px 8px}
+.tnew input[type=color],.te input[type=color]{width:42px;height:30px;padding:0;border:1px solid var(--bd);border-radius:6px;background:none;cursor:pointer}
+.tl.te{width:150px;display:flex;flex-direction:column;align-items:stretch;gap:4px;font-size:13px}
+.te input.tn{width:100%;background:var(--paper);border:1px solid var(--bd);border-radius:6px;color:var(--ink);padding:3px 6px;font-size:13px}
+.te input[type=color]{width:100%;height:22px}
+.te span{display:flex;gap:3px}.te span button{flex:1;border:1px solid var(--bd);border-radius:5px;background:var(--paper);color:var(--ink);cursor:pointer;font-size:11px;padding:1px 4px}
+/* modal */
+.modal{position:fixed;inset:0;z-index:70;background:rgba(5,8,18,.72);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;overflow:auto}
+.mbox{width:min(640px,100%);background:var(--panel);border:1px solid var(--bd);border-radius:18px;padding:20px;max-height:92vh;overflow:auto}
+.mbox h2{font:400 28px "Shippori Mincho",serif;margin:0 0 4px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.fields label{display:flex;flex-direction:column;gap:3px;font-size:13px}.fields input,.fields select,.fields textarea{padding:8px 10px;width:100%}
+.wide{grid-column:1/-1}#fSeL{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}.sebox{display:grid;grid-template-columns:30px 1fr 1fr;gap:8px;align-items:end}.sebox b{padding-bottom:8px;font-weight:500}
+.ph2{display:flex;gap:12px;align-items:center}.ph2 img{width:64px;height:88px;object-fit:cover;border-radius:8px;display:none}
+.ph2 .box{width:64px;height:88px;border:1px dashed var(--bd);border-radius:8px;display:grid;place-items:center;font-size:11px;color:var(--mute);text-align:center}
+.mact{display:flex;gap:10px;align-items:center}
+#toast{position:fixed;z-index:80;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.3s;font-size:14px}#toast.on{opacity:1;transform:translate(-50%,0)}
+/* fx */
+.fl{position:fixed;z-index:60;pointer-events:none;font:500 34px "Shippori Mincho",serif;color:var(--ac2);animation:rise 1s forwards}
+@keyframes rise{from{opacity:1;transform:translateY(0) scale(.6) rotate(-8deg)}to{opacity:0;transform:translateY(-70px) scale(1.4) rotate(8deg)}}
+.dot{position:fixed;z-index:50;width:7px;height:7px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--ac2);pointer-events:none;animation:dt .7s forwards}
+@keyframes dt{to{opacity:0;transform:translateY(24px) scale(.2)}}
+.bst{position:fixed;z-index:55;pointer-events:none;width:320px;height:320px;margin:-160px 0 0 -160px;border-radius:50%;background:repeating-conic-gradient(var(--ink) 0 1.4deg,transparent 1.4deg 7deg);-webkit-mask-image:radial-gradient(circle,transparent 18%,#000 19%,transparent 70%);mask-image:radial-gradient(circle,transparent 18%,#000 19%,transparent 70%);animation:bs .55s ease-out forwards}
+@keyframes bs{from{opacity:.9;transform:scale(.2)}to{opacity:0;transform:scale(1.2)}}
+.sfx2{position:fixed;z-index:56;pointer-events:none;font:500 40px "Shippori Mincho",serif;color:var(--ac2);animation:rise .9s forwards}
+@media (max-width:620px){.sw{order:5;max-width:none;flex-basis:100%}.logo{font-size:20px}}
+.paper{position:absolute;inset:0;z-index:2;pointer-events:none;mix-blend-mode:multiply;opacity:.5;background:radial-gradient(ellipse at 50% 40%,transparent 50%,rgba(0,0,0,.4)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* ===== FONDO: MOSAICO FIJO DE 8 COLUMNAS ===== */
+.pics{
+  position:absolute;inset:0;
+  display:flex;
+  gap:4px;
+  background:#f3f3f0;
+}
+.pics img{
+  flex:1 1 0;
+  min-width:0;
+  height:100%;
+  object-fit:cover;
+  object-position:center top;
+  display:block;
+}
+.bgts{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.bgt{position:relative}.bgt img{width:64px;height:90px;object-fit:cover;border-radius:6px;border:1px solid var(--bd)}
+.bgt button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:0;background:var(--ac2);color:#fff;cursor:pointer;font-size:11px;padding:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ===== v4.4 ===== */
+#sg{display:flex;flex-direction:column;gap:4px}.sgi{width:100%;border-radius:10px!important;padding:4px 10px 4px 4px!important;background:var(--panel2)}.sgi img{width:30px!important;height:42px!important}.sgi span{flex:1;text-align:left}
+.sync{margin:10px 0}
+.botb{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:60;width:58px;height:58px;border-radius:50%;border:2px solid var(--ac2);background:linear-gradient(135deg,var(--ac),var(--ac2));cursor:pointer;padding:0;overflow:hidden;font-size:26px;box-shadow:0 10px 28px rgba(0,0,0,.5);color:#fff}
+.botb img{width:100%;height:100%;object-fit:cover;display:block}
+#cp{position:fixed;right:14px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:61;width:min(360px,calc(100% - 28px));height:min(520px,calc(100% - 140px));display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+#cp[hidden]{display:none}
+#cp header{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--bd);background:var(--panel2)}#cp header div{flex:1;display:flex;flex-direction:column;line-height:1.2}#cp header small{color:var(--mute);font-size:11px}
+#cpI{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--ac2)}
+#cpM,#cpP{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}#cpP{display:block}#cpP[hidden],#cpM[hidden]{display:none}
+.m{max-width:86%;padding:8px 12px;border-radius:14px;font-size:14px;line-height:1.45}.m.b{background:var(--panel2);border:1px solid var(--bd);align-self:flex-start;border-bottom-left-radius:4px}.m.u{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+#cpF{display:flex;gap:6px;padding:10px;border-top:1px solid var(--bd)}#cpF input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--bd);border-radius:999px;padding:8px 14px}
+#cpP h4{margin:0 0 6px;font:400 18px "Shippori Mincho",serif}#cpP input{width:100%;margin:4px 0;background:var(--panel2);border:1px solid var(--bd);border-radius:8px;padding:6px 10px}#cpP details{margin-top:12px}
+.pk{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.chg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chg button{background:var(--panel2);border:1px solid var(--bd);border-radius:12px;padding:4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px}.chg button:hover{border-color:var(--ac2)}.chg img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true">
+<div class="lay blur"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"><defs>
+<pattern id="ht" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.6" fill="#000"/></pattern>
+<pattern id="hx" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="9" stroke="#000" stroke-width="1.6"/></pattern>
+<pattern id="rn" width="11" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(6)"><line x1="3" y1="0" x2="3" y2="30" stroke="#fff" stroke-width="1.6"/></pattern>
+<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4e4e1"/><stop offset=".6" stop-color="#8a8a8e"/><stop offset="1" stop-color="#2c2c30"/></linearGradient>
+<clipPath id="c1"><rect x="10" y="10" width="1580" height="520"/></clipPath>
+<clipPath id="c2"><rect x="10" y="545" width="470" height="445"/></clipPath>
+<clipPath id="c3"><rect x="495" y="545" width="230" height="445"/></clipPath>
+<clipPath id="c4"><rect x="740" y="545" width="410" height="205"/></clipPath>
+<clipPath id="c5"><rect x="1165" y="545" width="425" height="205"/></clipPath>
+<clipPath id="c6"><rect x="740" y="765" width="310" height="225"/></clipPath>
+<clipPath id="c7"><rect x="1065" y="765" width="525" height="225"/></clipPath>
+<g id="art">
+<rect width="1600" height="1000" fill="#f3f3f0"/>
+<g clip-path="url(#c1)"><rect x="10" y="10" width="1580" height="520" fill="url(#g1)"/>
+<path d="M640 0C860-30 1250 30 1430 190 1520 280 1570 400 1600 540L880 540C990 430 960 300 820 240 720 190 600 100 640 0Z" fill="#070708"/>
+<path d="M120 10L190 120 230 20 280 130 330 30 360 150 300 190 150 190Z" fill="#050505"/>
+<path d="M520 540L330 400 400 330 660 500Z" fill="#ecebe8" stroke="#000" stroke-width="7" stroke-linejoin="round"/>
+<path d="M470 540L330 430 360 400 560 540Z" fill="url(#hx)" opacity=".5"/>
+<g transform="translate(330 360) rotate(-35)"><rect x="-70" y="-52" width="140" height="104" rx="26" fill="#f1f0ed" stroke="#000" stroke-width="8"/><path d="M-22-50V-6M18-50V-6M52-40V-4M-70 10Q-20 30 70 12" stroke="#000" stroke-width="5" fill="none"/></g>
+<circle cx="330" cy="360" r="330" fill="none" stroke="#fff" stroke-width="260" stroke-dasharray="2 18" opacity=".5"/>
+<rect x="10" y="10" width="1580" height="520" fill="url(#rn)" opacity=".7"/></g>
+<g clip-path="url(#c2)"><rect x="10" y="545" width="470" height="445" fill="#b9b9b6"/><rect x="10" y="545" width="470" height="445" fill="url(#ht)" opacity=".25"/>
+<path d="M60 790L90 640 150 700 200 600 260 690 330 610 360 720 400 700 420 800Z" fill="#0a0a0a"/>
+<path d="M90 760Q90 960 240 995 390 960 400 760Z" fill="#efeeeb" stroke="#000" stroke-width="6"/>
+<rect x="110" y="800" width="120" height="80" rx="22" fill="#fff" fill-opacity=".5" stroke="#000" stroke-width="10"/><rect x="262" y="800" width="120" height="80" rx="22" fill="#fff" fill-opacity=".5" stroke="#000" stroke-width="10"/><path d="M230 835H262" stroke="#000" stroke-width="9"/>
+<path d="M135 845Q170 825 205 845M287 845Q322 825 357 845M200 945Q245 960 290 940" stroke="#000" stroke-width="6" fill="none"/>
+<path d="M10 990L40 930Q140 960 190 985L190 990ZM300 990L330 980Q430 950 480 930L480 990Z" fill="#0a0a0a"/></g>
+<g clip-path="url(#c3)"><rect x="495" y="545" width="230" height="445" fill="#f6f6f3"/><circle cx="610" cy="770" r="400" fill="none" stroke="#000" stroke-width="360" stroke-dasharray="1.5 16" opacity=".45"/>
+<path d="M520 560L720 560 700 700 640 650 600 720 540 700Z" fill="#0a0a0a"/>
+<path d="M560 700L690 700 690 760 668 800 690 818 674 840 690 880 670 940 560 990 520 990Z" fill="#f6f5f2" stroke="#000" stroke-width="5"/><path d="M640 770L675 764" stroke="#000" stroke-width="6"/></g>
+<g clip-path="url(#c4)"><rect x="740" y="545" width="410" height="205" fill="#cfcfcc"/><rect x="740" y="545" width="410" height="205" fill="url(#hx)" opacity=".3"/>
+<circle cx="820" cy="680" r="46" fill="#0a0a0a"/><ellipse cx="820" cy="690" rx="15" ry="22" fill="#fff"/><circle cx="940" cy="650" r="50" fill="#0a0a0a"/><ellipse cx="940" cy="660" rx="17" ry="24" fill="#fff"/><circle cx="1070" cy="690" r="44" fill="#0a0a0a"/><ellipse cx="1070" cy="700" rx="14" ry="20" fill="#fff"/></g>
+<g clip-path="url(#c5)"><rect x="1165" y="545" width="425" height="205" fill="#9d9d9a"/><rect x="1165" y="545" width="425" height="205" fill="url(#ht)" opacity=".35"/>
+<circle cx="1250" cy="680" r="48" fill="#0a0a0a"/><ellipse cx="1250" cy="692" rx="16" ry="24" fill="#fff"/><circle cx="1400" cy="660" r="52" fill="#0a0a0a"/><ellipse cx="1400" cy="672" rx="18" ry="26" fill="#fff"/></g>
+<g clip-path="url(#c6)"><rect x="740" y="765" width="310" height="225" fill="#e9e9e6"/><path d="M760 800H1030M760 840H1030M760 880H1030M800 780V990M850 780V990M900 780V990M950 780V990M1000 780V990" stroke="#000" stroke-width="3"/><path d="M860 990Q870 870 930 850 990 880 1000 990Z" fill="#0a0a0a"/></g>
+<g clip-path="url(#c7)"><rect x="1065" y="765" width="525" height="225" fill="#8d8d8a"/><circle cx="1300" cy="930" r="360" fill="none" stroke="#fff" stroke-width="300" stroke-dasharray="1.5 14" opacity=".4"/><path d="M1180 990Q1190 880 1300 860 1410 880 1420 990Z" fill="#0a0a0a"/><circle cx="1300" cy="830" r="52" fill="#0a0a0a"/></g>
+<g fill="none" stroke="#000" stroke-width="5"><rect x="10" y="10" width="1580" height="520"/><rect x="10" y="545" width="470" height="445"/><rect x="495" y="545" width="230" height="445"/><rect x="740" y="545" width="410" height="205"/><rect x="1165" y="545" width="425" height="205"/><rect x="740" y="765" width="310" height="225"/><rect x="1065" y="765" width="525" height="225"/></g>
+<g transform="rotate(-60 1180 640)"><rect x="760" y="590" width="900" height="100" fill="#fff" stroke="#000" stroke-width="7"/><text x="1210" y="662" text-anchor="middle" font-size="62" font-family="Shippori Mincho,serif" letter-spacing="40" fill="#000">ゴ ゴ ゴ ゴ</text></g>
+</g><clipPath id="d1"><polygon points="10,10 560,10 540,360 10,330"/></clipPath>
+<clipPath id="d2"><polygon points="575,10 1060,10 1010,380 560,370"/></clipPath>
+<clipPath id="d3"><polygon points="1075,10 1590,10 1590,330 1030,385"/></clipPath>
+<clipPath id="d4"><polygon points="10,345 545,375 1015,395 1590,345 1590,690 10,690"/></clipPath>
+<clipPath id="d5"><rect x="10" y="705" width="1580" height="285"/></clipPath>
+<g id="art2"><rect width="1600" height="1000" fill="#f3f3f0"/>
+<g clip-path="url(#d1)"><rect x="10" y="10" width="550" height="350" fill="#c8c8c5"/><rect x="10" y="10" width="550" height="350" fill="url(#hx)" opacity=".22"/>
+<path d="M150 360V230Q150 190 200 190 250 190 250 230V360Z" fill="#fafaf8" stroke="#000" stroke-width="5"/><circle cx="200" cy="150" r="40" fill="#f6f5f2" stroke="#000" stroke-width="5"/><path d="M158 140Q200 80 245 135L238 108 215 96 190 96 168 108Z" fill="#0a0a0a"/>
+<path d="M330 360V210Q330 170 380 170 430 170 430 210V360Z" fill="#e9e9e6" stroke="#000" stroke-width="5"/><circle cx="380" cy="130" r="42" fill="#f6f5f2" stroke="#000" stroke-width="5"/><path d="M336 120L342 80 362 100 380 70 396 100 420 82 424 120Q380 95 336 120Z" fill="#0a0a0a"/></g>
+<g clip-path="url(#d2)"><rect x="575" y="10" width="485" height="370" fill="#d6d6d3"/><rect x="575" y="10" width="485" height="370" fill="url(#hx)" opacity=".15"/>
+<path d="M600 380Q600 160 800 120 960 100 1020 250 1030 380Z" fill="#f2f1ee" stroke="#000" stroke-width="6"/><path d="M580 200Q640 20 860 10 990 20 1050 120 930 80 820 110 700 120 640 200Z" fill="#0a0a0a"/>
+<circle cx="830" cy="230" r="58" fill="#fff" stroke="#000" stroke-width="6"/><circle cx="830" cy="230" r="30" fill="none" stroke="#000" stroke-width="4"/><circle cx="830" cy="230" r="14" fill="#000"/><path d="M740 160Q830 120 920 165" stroke="#000" stroke-width="12" fill="none"/>
+<path d="M700 180q-14 22 0 34q14-12 0-34zM960 260q-12 20 0 32q12-12 0-32z" fill="#fff" stroke="#000" stroke-width="3"/><path d="M760 335Q830 300 900 335" stroke="#000" stroke-width="7" fill="none"/></g>
+<g clip-path="url(#d3)"><rect x="1030" y="10" width="560" height="380" fill="#b9b9b6"/><rect x="1030" y="10" width="560" height="380" fill="url(#ht)" opacity=".3"/>
+<path d="M1140 340Q1130 130 1280 90 1420 80 1500 200 1520 300 1500 340Z" fill="#f2f1ee" stroke="#000" stroke-width="6"/><path d="M1110 150Q1140 20 1320 10 1500 10 1560 110 1400 60 1250 90 1180 120 1150 200Z" fill="#050505"/>
+<path d="M1330 200Q1380 170 1440 205" stroke="#000" stroke-width="9" fill="none"/><circle cx="1385" cy="215" r="14" fill="#000"/><path d="M1290 290L1480 270 1470 310 1300 330Z" fill="#fff" stroke="#000" stroke-width="5"/><path d="M1330 285V322M1370 280V318M1410 276V314M1445 272V310" stroke="#000" stroke-width="3"/></g>
+<g clip-path="url(#d4)"><rect x="10" y="345" width="1580" height="345" fill="#a9a9a6"/><path d="M10 400L1590 520M10 470L1590 600M10 540L1590 680" stroke="#000" stroke-width="2" opacity=".5"/>
+<circle cx="560" cy="540" r="520" fill="none" stroke="#fff" stroke-width="420" stroke-dasharray="2 20" opacity=".5"/>
+<path d="M300 640L420 470 560 430 640 520 560 600 480 560 420 660Z" fill="#e8e8e5" stroke="#000" stroke-width="6" stroke-linejoin="round"/><path d="M420 470L560 430 600 500 480 540Z" fill="#2a2a2e"/>
+<circle cx="640" cy="440" r="44" fill="#f6f5f2" stroke="#000" stroke-width="5"/><path d="M600 420L610 360 640 400 665 350 680 410 690 430Q650 395 600 420Z" fill="#0a0a0a"/>
+<path d="M450 480L330 470 270 440" stroke="#000" stroke-width="30" stroke-linecap="round" fill="none"/><path d="M450 480L330 470 270 440" stroke="#f1f0ed" stroke-width="20" stroke-linecap="round" fill="none"/><rect x="215" y="405" width="80" height="62" rx="16" fill="#f1f0ed" stroke="#000" stroke-width="6" transform="rotate(-15 255 436)"/>
+<circle cx="1050" cy="480" r="34" fill="#fff" stroke="#000" stroke-width="5"/><path d="M1020 470Q1050 450 1080 475M1040 450Q1060 480 1040 512" stroke="#000" stroke-width="3" fill="none"/>
+<path d="M1180 690V560Q1180 520 1230 520 1280 520 1280 560V690Z" fill="#3a3a3f"/><circle cx="1230" cy="490" r="34" fill="#f6f5f2" stroke="#000" stroke-width="5"/></g>
+<g clip-path="url(#d5)"><rect x="10" y="705" width="1580" height="285" fill="#bdbdba"/><path d="M10 760H1590M10 810H1590M10 860H1590" stroke="#000" stroke-width="3"/><rect x="10" y="770" width="1580" height="210" fill="url(#ht)" opacity=".55"/>
+<g fill="#0a0a0a"><circle cx="90" cy="960" r="36"/><ellipse cx="90" cy="1010" rx="62" ry="48"/><circle cx="260" cy="970" r="40"/><ellipse cx="260" cy="1020" rx="66" ry="50"/><circle cx="440" cy="955" r="34"/><ellipse cx="440" cy="1005" rx="58" ry="46"/><circle cx="640" cy="975" r="38"/><ellipse cx="640" cy="1025" rx="64" ry="50"/><circle cx="840" cy="960" r="36"/><ellipse cx="840" cy="1010" rx="62" ry="48"/><circle cx="1040" cy="972" r="40"/><ellipse cx="1040" cy="1022" rx="66" ry="50"/><circle cx="1240" cy="958" r="35"/><ellipse cx="1240" cy="1008" rx="60" ry="47"/><circle cx="1440" cy="970" r="38"/><ellipse cx="1440" cy="1020" rx="64" ry="50"/></g></g>
+<g fill="#fff" stroke="#000" stroke-width="5"><rect x="40" y="365" width="120" height="270" rx="14"/><rect x="1330" y="385" width="110" height="200" rx="14"/><rect x="560" y="725" width="110" height="215" rx="14"/></g>
+<g font-family="Zen Kaku Gothic New,sans-serif" font-weight="500" font-size="34" fill="#000" style="writing-mode:vertical-rl"><text x="100" y="385">¡¡INCREÍBLE!!</text><text x="1385" y="400">¡SALTA!</text><text x="615" y="742">¡QUÉ ALTURA!</text></g>
+<g fill="none" stroke="#000" stroke-width="5"><polygon points="10,10 560,10 540,360 10,330"/><polygon points="575,10 1060,10 1010,380 560,370"/><polygon points="1075,10 1590,10 1590,330 1030,385"/><polygon points="10,345 545,375 1015,395 1590,345 1590,690 10,690"/><rect x="10" y="705" width="1580" height="285"/></g></g>
+<pattern id="tile" width="3200" height="1000" patternUnits="userSpaceOnUse" patternTransform="scale(.3)"><use href="#art"/><use href="#art2" x="1600"/></pattern></defs><rect width="1600" height="1000" fill="url(#tile)"/></svg></div>
+<div class="lens"><div class="lay sharp"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"><rect width="1600" height="1000" fill="url(#tile)"/></svg><div class="tint"></div></div></div>
+<div class="paper"></div><div class="rain"></div>
+</div>
+
+<header class="nav">
+  <div class="logo">ANIMETECA<small>漫画</small></div>
+  <nav class="menu" id="menu"><button data-v="home" aria-pressed="true" type="button">Inicio</button><button data-v="cal" aria-pressed="false" type="button">Calendario</button><button data-v="tier" aria-pressed="false" type="button">Tier list</button></nav>
+  <div class="sw"><input type="search" id="q" placeholder="Buscar en tu lista…" aria-label="Buscar" autocomplete="off"><div id="res" role="listbox"></div></div>
+  <button class="cta" id="openAdd" type="button">＋ Añadir</button>
+  <button class="ic" id="bgBtn" type="button" aria-label="Cambiar fondo" title="Fondo de manga">画</button>
+  <button class="ic" id="theme" type="button" aria-label="Cambiar tema">◐</button>
+</header>
+<div class="wrap">
+  <section id="vHome">
+    <div class="hero" id="hero"></div>
+    <section class="stats" aria-label="Resumen">
+      <div class="stat"><b id="sT">0</b><span>en la lista</span></div>
+      <div class="stat"><b id="sD">0</b><span>completados</span></div>
+      <div class="stat"><b id="sW">0</b><span>viendo</span></div>
+      <div class="stat"><b id="sE">0</b><span>episodios vistos</span></div>
+      <div class="stat"><b id="sH">0</b><span>horas vistas</span></div>
+    </section>
+    <div class="bar"><div class="chips" id="tabs"></div>
+      <select class="sm" id="sort" aria-label="Ordenar"><option value="new">Recientes</option><option value="az">A–Z</option><option value="sc">Mejor nota</option><option value="fav">Favoritos</option></select>
+      <button class="roll" id="rnd" type="button">ルーレット · ¿Qué veo hoy?</button></div>
+    <h2 class="sec">Mi estantería <small id="cnt"></small></h2>
+    <main class="grid" id="grid"></main>
+  </section>
+  <section id="vCal" hidden></section>
+  <section class="tiersec" id="tier" hidden></section>
+</div>
+<div class="modal" id="addm" hidden>
+  <div class="mbox" role="dialog" aria-label="Añadir anime">
+    <h2>追加 · Añade tu anime</h2>
+    <p class="hint">Busca una franquicia (ej. "Demon Slayer") y se cargarán todas sus temporadas en una sola ficha.</p>
+    <div class="fields">
+      <label>Título<input id="fT" maxlength="80" autocomplete="off" placeholder="Empieza a escribir: Demon Slayer…"></label><div class="wide" id="sg"></div>
+      <label>Género<input id="fG" maxlength="30" placeholder="Acción, comedia, slice of life…"></label>
+      <label>Temporadas<input id="fSe" type="number" min="1" value="1"></label>
+      <label>Duración por defecto (min)<input id="fDu" type="number" min="1" max="600" value="24"></label>
+      <div class="wide" id="fSeL"></div>
+      <label>Estado<select id="fS"><option value="pend">Por ver</option><option value="view">Viendo</option><option value="done">Completado</option><option value="hold">En pausa</option><option value="drop">Abandonado</option></select></label>
+      <label>Próximo episodio (opcional)<input id="fNx" type="datetime-local"></label>
+      <div class="wide ph2"><div class="box" id="fBox">Sin foto</div><img id="fImg" alt="Vista previa"><label style="flex:1">Foto del anime<input id="fF" type="file" accept="image/*"></label></div>
+      <label class="wide">Sinopsis / tu nota<textarea id="fD" rows="3" placeholder="Se rellena sola al elegir un anime"></textarea></label>
+    </div>
+    <div class="mact"><button class="cta" id="go" type="button">Añadir a mi estantería</button><button class="ghost" id="cancel" type="button" style="color:var(--ink);border-color:var(--bd)">Cancelar</button></div>
+  </div>
+</div>
+<div class="modal" id="bgm" hidden><div class="mbox" role="dialog" aria-label="Fondo de manga"><h2>画 · Fondo de manga</h2>
+<p class="hint">Sube fotos de tus propias páginas de manga (todas las que quieras, o pega URLs) y se repartirán en 8 columnas de fondo. Las fotos se guardan solo en tu navegador.</p>
+<label class="cta" style="display:inline-block">＋ Subir fotos<input id="bgF" type="file" accept="image/*" multiple hidden></label>
+<div class="ln"><input class="dt" id="bgU" placeholder="…o pega la URL de una imagen"><button class="tab" id="bgUb" type="button">Añadir URL</button></div><div class="bgts" id="bgT"></div>
+<label class="ln">Más nítido<input id="bgV" type="range" min="15" max="90" value="64">más suave</label>
+<div class="mact" style="margin-top:14px"><button class="ghost" id="bgOff" type="button" style="color:var(--ink);border-color:var(--bd)">Usar páginas dibujadas</button><button class="cta" id="bgX" type="button">Listo</button></div></div></div>
+<div class="modal" id="cum" hidden><div class="mbox" role="dialog" aria-label="Ponerse al día"><h2>⏱ <span id="cuT"></span></h2><p class="hint" id="cuS"></p>
+<label class="ln">Horas al día<input id="cuH" type="range" min="0.5" max="8" step="0.5" value="2"><b id="cuHv">2 h</b></label><p id="cuR" style="font-size:16px"></p>
+<div class="mact"><button class="cta" id="cuP" type="button">▶ Ver siguiente episodio</button><button class="ghost" id="cuX" type="button" style="color:var(--ink);border-color:var(--bd)">Cerrar</button></div></div></div>
+<button id="bot" class="botb" type="button" aria-label="Abrir chatbot"><span id="botA">💬</span></button>
+<section id="cp" hidden><header><img id="cpI" alt="" hidden><div><b id="cpN">Chatbot</b><small id="cpS"></small></div><button class="lnk" id="cpC" type="button">⚙ Personaje</button><button class="lnk" id="cpX" type="button" aria-label="Cerrar">✕</button></header>
+<div id="cpM"></div><div id="cpP" hidden></div><form id="cpF"><input id="cpQ" autocomplete="off" placeholder="Pregúntame lo que quieras…" aria-label="Mensaje"><button class="cta" type="submit">➤</button></form></section>
+<div id="toast" role="status"></div>
+<input type="file" id="pf" accept="image/*" hidden>
+<script>
+(function(){
+var KEY="animeteca-v2",$=function(i){return document.getElementById(i)};
+var B=[["Haikyuu!!","Deportes",[25,25,10,25],"Un chico bajito, un sueño enorme y un club de voleibol por construir."],
+["Black Clover","Acción · Fantasía",[170],"Dos huérfanos rivales y una promesa: ser el rey mago."],
+["Jujutsu Kaisen","Acción · Sobrenatural",[24,23],"Hechiceros, maldiciones y combates de estilo impecable."],
+["Fullmetal Alchemist: Brotherhood","Aventura",[64],"Dos hermanos y el precio de desafiar la alquimia."],
+["Death Note","Thriller",[37],"Un cuaderno, un estudiante brillante y un duelo mental."],
+["Attack on Titan","Acción · Drama",[25,12,22,28],"La humanidad tras los muros y una amenaza que lo cambia todo."],
+["Demon Slayer","Acción · Aventura",[26,11,11],"Espadas, respiración y un hermano que nunca se rinde."],
+["One Punch Man","Comedia · Acción",[12,12],"El héroe más fuerte del mundo y su aburrimiento."],
+["Mob Psycho 100","Comedia · Sobrenatural",[12,13,12],"Un chico con poderes enormes que solo quiere ser normal."],
+["Spy × Family","Comedia · Familia",[25,12],"Un espía, una asesina y una telépata fingiendo ser familia."],
+["Cowboy Bebop","Ciencia ficción",[26],"Cazarrecompensas, jazz y estilo galáctico."],
+["Your Name","Romance · Película",[1],"Dos desconocidos y un vínculo imposible.",107]];
+var L={pend:"Por ver",view:"Viendo",done:"Completado",hold:"En pausa",drop:"Abandonado"};
+function mk(a,i){return {id:"b"+i,t:a[0],g:a[1],d:a[3],img:"",s:"pend",r:0,f:0,rv:"",tier:"",dur:a[4]||24,nx:"",fx:50,fy:50,fz:1,ex:[],ss:a[2].map(function(n){return {nm:"",n:n,p:0,m:a[4]||24,cover:""}})}}
+function load(){try{var v=localStorage.getItem(KEY);return v?JSON.parse(v):null}catch(e){return null}}
+var st=load()||B.map(mk),filter="all",open={},target=null,fimg="",sel=null,view="home",delArm=null,delT,hi=0,hT,toastT;
+var tabState={}; /* pestaña activa por anime */
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));return true}catch(e){say("No cabe más: prueba con una foto más pequeña.");return false}}
+function say(t){var o=$("toast");o.textContent=t;o.classList.add("on");clearTimeout(toastT);toastT=setTimeout(function(){o.classList.remove("on")},3000)}
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+function kj(g){var m=[["deport","熱"],["acci","闘"],["fant","魔"],["avent","旅"],["thril","謎"],["miste","謎"],["dram","涙"],["comed","笑"],["sobren","霊"],["roman","恋"],["ciencia","宙"],["famil","家"],["terror","怖"],["slice","日"],["music","音"],["mecha","機"]],s=(g||"").toLowerCase();for(var i=0;i<m.length;i++)if(s.indexOf(m[i][0])>-1)return m[i][1];return "漫"}
+function burst(el,ch){var r=el.getBoundingClientRect(),s=document.createElement("span");s.className="fl";s.textContent=ch;s.style.left=(r.left+r.width/2-17)+"px";s.style.top=(r.top-6)+"px";document.body.appendChild(s);setTimeout(function(){s.remove()},1000)}
+function tot(a){return a.ss.reduce(function(s,x){return s+x.n},0)}
+function mins(a,all){var m=0;a.ss.forEach(function(x){var b=x.m||a.dur||24,c=all?x.n:x.p;m+=c*b;for(var e in (x.eo||{}))if(+e<=c)m+=x.eo[e]-b;});(a.ex||[]).forEach(function(x){if(all||x.w)m+=x.m||24});return m}
+function fmt(m){return (m>=60?Math.floor(m/60)+" h ":"")+(m%60)+" min"}
+function seen(a){return a.ss.reduce(function(s,x){return s+x.p},0)}
+function sync(a){var t=tot(a),v=seen(a);if(v>=t&&t>0)a.s="done";else if(v>0&&(a.s=="pend"||a.s=="done"))a.s="view"}
+function by(id){return st.filter(function(a){return a.id==id})[0]}
+function nextEp(a){for(var i=0;i<a.ss.length;i++)if(a.ss[i].p<a.ss[i].n)return {i:i,e:a.ss[i].p+1};return null}
+function imgSt(a){var x=a.fx==null?50:a.fx,y=a.fy==null?50:a.fy,z=a.fz||1;return "object-position:"+x+"% "+y+"%;transform:scale("+z+");transform-origin:"+x+"% "+y+"%"}
+function toLocal(d){function p(n){return (n<10?"0":"")+n}return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"T"+p(d.getHours())+":"+p(d.getMinutes())}
+function bump(a,f){if(!a.nx)return;var d=new Date(a.nx);if(!f&&d>Date.now())return;d.setDate(d.getDate()+7);while(d<Date.now())d.setDate(d.getDate()+7);a.nx=toLocal(d)}
+function cdTxt(iso){var ms=new Date(iso)-Date.now();if(isNaN(ms))return "";if(ms<=0)return "¡Ya salió!";var m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+"d "+h+"h":(h?h+"h "+(m%60)+"m":(m%60)+"m")}
+function updCd(){[].forEach.call(document.querySelectorAll("[data-cd]"),function(e){e.textContent=cdTxt(e.dataset.cd)})}
+setInterval(updCd,30000);
+function img(file,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var w=420,h=Math.round(im.height*w/im.width),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);cb(c.toDataURL("image/jpeg",.78))};im.src=r.result};r.readAsDataURL(file)}
+function sorted(l){var s=$("sort").value,c=l.slice();if(s=="az")c.sort(function(a,b){return a.t.localeCompare(b.t)});if(s=="sc")c.sort(function(a,b){return b.r-a.r});if(s=="fav")c.sort(function(a,b){return b.f-a.f});return c}
+function fixScroll(root,sc){[].forEach.call(root.querySelectorAll(".eps"),function(e){if(sc&&sc[e.dataset.k]!=null)e.scrollTop=sc[e.dataset.k];else{var t=e.querySelector(".ep:not(.on)");e.scrollTop=t?Math.max(0,t.offsetTop-24):0}})}
+function setSeen(a,n){a.ss.forEach(function(x){var p=Math.max(0,Math.min(x.n,n));x.p=p;n-=p});var v=seen(a);if(a.s=="done"||a.s=="view"||a.s=="pend")a.s=v>=tot(a)?"done":(v>0?"view":"pend")}
+
+function card(a){
+ var c=document.createElement("article"),t=tot(a),v=seen(a),pct=t?Math.round(v/t*100):0,nx=nextEp(a),ex=a.ex||[],wx=ex.filter(function(x){return x.w}).length;
+ c.className="pc"+(a.s=="done"?" done":"");c.id="c-"+a.id;c.dataset.id=a.id;c.style.setProperty("--h",hue(a.t));
+ var ss=a.ss.map(function(x,i){
+  var tl="";
+  for(var e=1;e<=x.n;e++){
+   tl+='<button class="ep'+(e<=x.p?" on":"")+(x.eo&&x.eo[e]?" sp":"")+'" title="Ep. '+e+(x.eo&&x.eo[e]?" · "+x.eo[e]+" min":"")+'" data-a="ep" data-i="'+i+'" data-e="'+e+'" aria-label="Episodio '+e+'">'+e+'</button>';
+  }
+  var ek=Object.keys(x.eo||{}).sort(function(a,b){return a-b}).filter(function(e){return +e<=x.n});
+  var eoHtml='<div class="eoa"><span class="mn">Duración especial:</span><input class="nm" type="number" min="1" max="'+x.n+'" placeholder="Ep." data-a="eoe" aria-label="Episodio"><input class="nm" type="number" min="1" max="600" placeholder="min" data-a="eom" aria-label="Minutos"><button class="lnk" data-a="eoadd" data-i="'+i+'">+ fijar</button>'+
+   ek.map(function(e){return '<span class="eoc">Ep. '+e+' · '+x.eo[e]+' min<button class="lnk" data-a="eodel" data-i="'+i+'" data-e="'+e+'" aria-label="Quitar">✕</button></span>'}).join("")+'</div>';
+  var coverHtml = x.cover ? '<img class="season-cover" src="'+x.cover+'" alt="Portada T'+(i+1)+'">' : '';
+  return '<div class="season-header">'+coverHtml+'<b>Temporada '+(i+1)+(x.nm?' · <span class="tnm">'+esc(x.nm)+'</span>':'')+'</b></div>'+
+   '<div class="sh"><span class="mn"><input class="nm" type="number" min="1" max="99999" value="'+x.n+'" data-a="n" data-i="'+i+'" aria-label="Episodios de T'+(i+1)+'"> ep · <input class="nm" type="number" min="1" max="600" value="'+(x.m||a.dur||24)+'" data-a="sm" data-i="'+i+'" aria-label="Minutos por episodio de T'+(i+1)+'"> min/ep</span>'+
+   '<button class="lnk" data-a="all" data-i="'+i+'">Completar</button></div>'+
+   '<div class="eps" data-k="'+a.id+':'+i+'">'+tl+'</div>'+eoHtml;
+ }).join("");
+ var exl=ex.map(function(x,j){return '<div class="exr"><label><input type="checkbox" data-a="exw" data-i="'+j+'"'+(x.w?" checked":"")+'><span class="ek">'+esc(x.k)+'</span> '+esc(x.n)+'</label><input class="nm" type="number" min="1" max="600" value="'+(x.m||24)+'" data-a="exm" data-i="'+j+'" aria-label="Minutos"> min<button class="lnk" data-a="exdel" data-i="'+j+'" aria-label="Quitar">✕</button></div>'}).join("");
+ var sc='<option value="0">Sin nota</option>';for(var k=10;k>=1;k--)sc+='<option value="'+k+'"'+(a.r==k?" selected":"")+'>★ '+k+'/10</option>';
+ var foto=a.img?'<div class="ln">Horizontal<input type="range" data-a="fx" min="0" max="100" value="'+(a.fx==null?50:a.fx)+'"></div><div class="ln">Vertical<input type="range" data-a="fy" min="0" max="100" value="'+(a.fy==null?50:a.fy)+'"></div><div class="ln">Zoom<input type="range" data-a="fz" min="100" max="300" step="5" value="'+Math.round((a.fz||1)*100)+'"></div>':'<p class="hint">Añade una foto para poder ajustarla.</p>';
+ var activeTab = tabState[a.id] || "info";
+ c.innerHTML='<div class="pz">'+(a.img?'<img src="'+a.img+'" alt="" style="'+imgSt(a)+'">':'<button class="ph" data-a="photo" type="button" aria-label="Añadir foto"><b>'+kj(a.g)+'</b><small>＋ foto</small></button>')+
+ '<span class="b1">EP '+v+'/'+t+'</span>'+(a.s=="done"?'<span class="b2 ok">完 COMPLETO</span>':(a.nx?'<span class="b2" data-cd="'+a.nx+'"></span>':''))+
+ '<div class="pt"><h3>'+esc(a.t)+'</h3><small>'+kj(a.g)+' '+esc(a.g||"Sin género")+' · '+a.ss.length+(a.ss.length==1?" temp.":" temps.")+(ex.length?" · "+wx+"/"+ex.length+" extras":"")+'</small></div>'+
+ '<button class="hv'+(a.f?" on":"")+'" data-a="fav" aria-label="Favorito">'+(a.f?"♥":"♡")+'</button>'+
+ '<button class="hv delbtn'+(delArm==a.id?" arm":"")+'" data-a="del" aria-label="Eliminar anime" title="'+(delArm==a.id?"¿Eliminar de verdad?":"Eliminar anime")+'">'+(delArm==a.id?"🗑":"✕")+'</button></div>'+
+ '<div class="bd"><div class="sl-row"><span class="cn">'+v+' / '+t+' ep.</span><span class="pc2">'+pct+'%</span></div>'+
+ '<input type="range" class="sl" data-a="sl" min="0" max="'+t+'" value="'+v+'" style="--pc:'+pct+'%" aria-label="Episodios vistos">'+
+ '<div class="nr">'+(nx?'<button class="next" data-a="next" data-i="'+nx.i+'"><span>▶ Ep. '+nx.e+' · T'+(nx.i+1)+'</span><b>次</b></button>':'<div class="fin">Serie completa 完</div>')+'<button class="prev" data-a="prev" title="Quitar último episodio visto"'+(v?"":" disabled")+'>− ep.</button><button class="prev" data-a="cu" title="¿Cuánto tardo en ponerme al día?">⏱</button></div>'+
+ '<div class="sel"><select class="sm" data-a="st" aria-label="Estado">'+Object.keys(L).map(function(o){return '<option value="'+o+'"'+(a.s==o?" selected":"")+'>'+L[o]+'</option>'}).join("")+'</select><select class="sm" data-a="sc" aria-label="Nota">'+sc+'</select></div>'+
+ '<input class="rv" data-a="rv" maxlength="140" value="'+esc(a.rv||"").replace(/"/g,"&quot;")+'" placeholder="Mi reseña breve (opcional)" aria-label="Reseña">'+
+ '<div class="tabs2">'+
+  ['info','temps','extras','ajustes'].map(function(tb){
+    var lab = {info:"ℹ Info", temps:"📺 Temporadas", extras:"🎬 Extras", ajustes:"⚙ Ajustes"}[tb];
+    return '<button class="t2" data-tab="'+tb+'" aria-pressed="'+(activeTab===tb)+'">'+lab+'</button>';
+  }).join("")+
+ '</div>'+
+ '<div class="tabpanel" data-panel="info"'+(activeTab!=="info"?" hidden":"")+'>'+(a.d?'<p class="hint syn">'+esc(a.d)+'</p>':'<p class="hint">Sin sinopsis.</p>')+'</div>'+
+ '<div class="tabpanel" data-panel="temps"'+(activeTab!=="temps"?" hidden":"")+'>'+ss+'</div>'+
+ '<div class="tabpanel" data-panel="extras"'+(activeTab!=="extras"?" hidden":"")+'>'+
+  '<div class="sh"><b>Películas y OVAs · '+wx+' / '+ex.length+'</b></div>'+exl+
+  '<div class="exa"><select class="sm" data-a="exk" aria-label="Tipo"><option>Película</option><option>OVA</option><option>Especial</option><option>ONA</option></select><input class="rv exn" data-a="exn" maxlength="50" placeholder="Título (ej. Mugen Train)" aria-label="Título"><input class="nm exm0" type="number" min="1" max="600" value="100" data-a="exk" aria-label="Minutos" title="Minutos"> min<button class="lnk" data-a="exadd">+ añadir</button></div>'+
+ '</div>'+
+ '<div class="tabpanel" data-panel="ajustes"'+(activeTab!=="ajustes"?" hidden":"")+'>'+
+  '<div class="ln">Duración por defecto<input class="nm" type="number" min="1" max="600" value="'+(a.dur||24)+'" data-a="dur" aria-label="Minutos por episodio"> min</div>'+
+  '<p class="hint" style="margin:6px 0 0">Tiempo: '+fmt(mins(a))+' vistos de '+fmt(mins(a,1))+' (cuenta OVAs y películas vistas)</p>'+
+  '<div class="ln">Próximo episodio<input class="dt" type="datetime-local" value="'+(a.nx||"")+'" data-a="nx"></div>'+
+  '<div class="act"><button class="lnk" data-a="nx7">+7 días</button><button class="lnk" data-a="nxc">Quitar fecha</button></div>'+
+  '<div class="sh"><b>Foto del recuadro</b><button class="lnk" data-a="photo">Cambiar</button></div>'+foto+
+  '<div class="act"><button class="lnk" data-a="addS">+ temporada</button>'+(a.ss.length>1?'<button class="lnk" data-a="delS">− última</button>':'')+'</div>'+
+ '</div>';
+ return c}
+function stats(){var d=st.filter(function(a){return a.s=="done"}).length,ep=st.reduce(function(s,a){return s+seen(a)},0),mn=st.reduce(function(s,a){return s+mins(a)},0);
+ $("sT").textContent=st.length;$("sD").textContent=d;$("sW").textContent=st.filter(function(a){return a.s=="view"}).length;$("sE").textContent=ep;$("sH").textContent=Math.round(mn/6)/10}
+function render(){
+ var sc={};[].forEach.call(document.querySelectorAll(".eps"),function(e){sc[e.dataset.k]=e.scrollTop});
+ var g=$("grid");g.innerHTML="";var l=sorted(st.filter(function(a){return filter=="all"||a.s==filter}));
+ if(!l.length)g.innerHTML='<div class="empty">Aquí no hay nada todavía. Pulsa «＋ Añadir» o cambia de filtro.</div>';
+ l.forEach(function(a){g.appendChild(card(a))});$("cnt").textContent=l.length+" de "+st.length;
+ stats();fixScroll(g,sc);renderHero();updCd();if(view=="tier")renderTier();if(view=="cal")renderCal()}
+function renderHero(){var h=$("hero"),l=st.filter(function(a){return a.f}).slice(0,8);
+ if(!l.length){h.innerHTML='<div class="hs on"><div class="hc"><span class="tg">お気に入り · FAVORITOS</span><h2>Aquí van tus favoritos</h2><p>Pulsa el corazón ♡ de cualquier anime y aparecerá en este destacado.</p></div></div>';return}
+ if(hi>=l.length)hi=0;
+ h.innerHTML=l.map(function(a,i){var n=nextEp(a);return '<div class="hs'+(i==hi?" on":"")+'" style="--h:'+hue(a.t)+'"><div class="hb"'+(a.img?' style="background-image:url('+a.img+')"':'')+'></div><div class="hc"><span class="tg">'+"♥ FAVORITO"+' · '+esc(a.g||"")+'</span><h2>'+esc(a.t)+'</h2><p>'+(n?'Siguiente: T'+(n.i+1)+' · Ep. '+n.e+(a.nx?' · sale en <b data-cd="'+a.nx+'"></b>':''):'Serie completa')+(a.r?' · ★ '+a.r+'/10':'')+'</p><div class="hbt">'+(n?'<button class="cta" data-h="next" data-id="'+a.id+'">▶ Ver ep. '+n.e+'</button>':'')+'<button class="ghost" data-h="go" data-id="'+a.id+'">Ver ficha</button></div></div>'+(a.img?'<img class="hp" src="'+a.img+'" alt="">':'<div class="hp ph0">'+kj(a.g)+'</div>')+'</div>'}).join("")+'<div class="hd">'+l.map(function(a,i){return '<button data-h="dot" data-i="'+i+'" class="'+(i==hi?"on":"")+'" aria-label="Destacado '+(i+1)+'"></button>'}).join("")+'</div>';
+ clearInterval(hT);if(l.length>1)hT=setInterval(function(){hi=(hi+1)%l.length;[].forEach.call(h.querySelectorAll(".hs"),function(s,i){s.classList.toggle("on",i==hi)});[].forEach.call(h.querySelectorAll(".hd button"),function(s,i){s.classList.toggle("on",i==hi)})},6000)}
+$("hero").addEventListener("click",function(e){var b=e.target.closest("[data-h]");if(!b)return;var k=b.dataset.h;
+ if(k=="dot"){hi=+b.dataset.i;renderHero();return}var a=by(b.dataset.id);if(!a)return;
+ if(k=="go"){jump(a.id);return}
+ var n=nextEp(a);if(!n)return;a.ss[n.i].p++;sync(a);bump(a);burst(b,"見");save();render()});
+
+/* ---- tarjetas: eventos ---- */
+$("grid").addEventListener("click",function(e){
+ var tabBtn = e.target.closest("[data-tab]");
+ if(tabBtn){
+  var art = tabBtn.closest(".pc");
+  var aid = art.dataset.id;
+  tabState[aid] = tabBtn.dataset.tab;
+  [].forEach.call(art.querySelectorAll(".t2"), function(b){ b.setAttribute("aria-pressed", b===tabBtn); });
+  [].forEach.call(art.querySelectorAll(".tabpanel"), function(p){ p.hidden = p.dataset.panel !== tabBtn.dataset.tab; });
+  return;
+ }
+ var t=e.target.closest("[data-a]");if(!t||/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))return;
+ var c=t.closest(".pc"),a=by(c.dataset.id),i=+t.dataset.i,k=t.dataset.a;
+ if(k=="cu"){openCu(a);return}
+ else if(k=="prev"){for(var j=a.ss.length-1;j>=0;j--)if(a.ss[j].p>0){a.ss[j].p--;break}if(a.s=="done"||a.s=="view")a.s=seen(a)==0?"pend":(seen(a)<tot(a)?"view":"done")}
+ else if(k=="exadd"){var bx=t.closest(".exa"),nm=bx.querySelector(".exn").value.trim();if(!nm){bx.querySelector(".exn").focus();return}(a.ex=a.ex||[]).push({k:bx.querySelector("select").value,n:nm,w:0,m:Math.max(1,Math.min(600,+bx.querySelector(".exm0").value||24))})}
+ else if(k=="exdel")a.ex.splice(i,1);
+ else if(k=="eoadd"){var bo=t.closest(".eoa"),ee=Math.round(+bo.querySelector("[data-a=eoe]").value),mm=Math.round(+bo.querySelector("[data-a=eom]").value),sx=a.ss[i];if(!(ee>=1&&ee<=sx.n&&mm>=1&&mm<=600)){say("Pon un episodio de 1 a "+sx.n+" y sus minutos.");return}(sx.eo=sx.eo||{})[ee]=mm}
+ else if(k=="eodel")delete a.ss[i].eo[t.dataset.e];
+ else if(k=="next"){var s=a.ss[i];s.p=Math.min(s.n,s.p+1);sync(a);bump(a);burst(t,seen(a)>=tot(a)?"完":"見")}
+ else if(k=="ep"){var s2=a.ss[i],e2=+t.dataset.e;s2.p=s2.p==e2?e2-1:e2;if(a.s=="done"&&seen(a)<tot(a))a.s="view";sync(a);burst(t,"見")}
+ else if(k=="all"){a.ss[i].p=a.ss[i].n;sync(a);burst(t,"完")}
+ else if(k=="fav")a.f=a.f?0:1;
+ else if(k=="addS"){var ls=a.ss[a.ss.length-1];a.ss.push({nm:"",n:ls.n,p:0,m:ls.m,cover:""})}
+ else if(k=="delS"){a.ss.pop();sync(a)}
+ else if(k=="nx7"){var d=a.nx?new Date(a.nx):new Date();d.setDate(d.getDate()+7);a.nx=toLocal(d)}
+ else if(k=="nxc")a.nx="";
+ else if(k=="del"){if(delArm!==a.id){delArm=a.id;clearTimeout(delT);delT=setTimeout(function(){delArm=null;render()},3500);render();return}delArm=null;st=st.filter(function(x){return x!==a})}
+ else if(k=="photo"){target=a.id;$("pf").click();return}
+ save();render()});
+$("grid").addEventListener("change",function(e){var t=e.target,k=t.dataset.a;if(!k)return;var a=by(t.closest(".pc").dataset.id);
+ if(k=="exk"&&t.tagName=="SELECT")t.closest(".exa").querySelector(".exm0").value=t.value=="Película"?100:24;if(k=="exn"||k=="exk"||k=="eoe"||k=="eom")return;if(k=="fx"||k=="fy"||k=="fz"){save();return}
+ if(k=="snm"){a.ss[+t.dataset.i].nm=t.value.trim()}
+ else if(k=="n"){var s=a.ss[+t.dataset.i];s.n=Math.max(1,Math.min(99999,+t.value||1));s.p=Math.min(s.p,s.n);sync(a)}
+ else if(k=="st"){a.s=t.value;if(a.s=="done")a.ss.forEach(function(x){x.p=x.n});if(a.s=="pend")a.ss.forEach(function(x){x.p=0})}
+ else if(k=="sc")a.r=+t.value;else if(k=="rv")a.rv=t.value.trim();else if(k=="sl")setSeen(a,+t.value);
+ else if(k=="exw")a.ex[+t.dataset.i].w=t.checked?1:0;
+ else if(k=="dur")a.dur=Math.max(1,Math.min(600,+t.value||24));else if(k=="sm")a.ss[+t.dataset.i].m=Math.max(1,Math.min(600,+t.value||24));else if(k=="exm")a.ex[+t.dataset.i].m=Math.max(1,Math.min(600,+t.value||24));else if(k=="nx")a.nx=t.value;
+ save();render()});
+$("grid").addEventListener("input",function(e){var t=e.target,k=t.dataset.a,c=t.closest(".pc");if(!c||!k)return;var a=by(c.dataset.id);
+ if(k=="sl"){var tt=tot(a),v=+t.value,pc=Math.round(v/tt*100);t.style.setProperty("--pc",pc+"%");c.querySelector(".cn").textContent=v+" / "+tt+" ep.";c.querySelector(".pc2").textContent=pc+"%";c.querySelector(".b1").textContent="EP "+v+"/"+tt}
+ else if(k=="fx"||k=="fy"||k=="fz"){a[k]=k=="fz"?+t.value/100:+t.value;var im=c.querySelector(".pz img");if(im)im.style.cssText=imgSt(a)}});
+$("grid").addEventListener("keydown",function(e){if(e.key=="Enter"&&e.target.classList.contains("exn")){e.preventDefault();e.target.parentNode.querySelector("[data-a=exadd]").click()}if(e.key=="Enter"&&e.target.dataset.a=="eom"){e.preventDefault();e.target.parentNode.querySelector("[data-a=eoadd]").click()}});
+$("pf").onchange=function(e){var f=e.target.files[0];if(!f||!target)return;var id=target;img(f,function(u){var a=by(id);if(a){a.img=u;a.fx=50;a.fy=50;a.fz=1;save();render()}});e.target.value=""};
+
+/* ---- filtros, búsqueda, ruleta ---- */
+var tabs=[["all","全 Todos"],["pend","未 Por ver"],["view","視 Viendo"],["done","完 Completados"],["hold","休 En pausa"],["drop","止 Abandonados"]];
+function setTab(f){filter=f;[].forEach.call($("tabs").children,function(x,i){x.setAttribute("aria-pressed",tabs[i][0]==f)});render()}
+tabs.forEach(function(t){var b=document.createElement("button");b.type="button";b.className="tab";b.textContent=t[1];b.setAttribute("aria-pressed",t[0]==filter);b.onclick=function(){setTab(t[0])};$("tabs").appendChild(b)});
+function jump(id){setView("home");setTab("all");var c=$("c-"+id);if(c){c.scrollIntoView({block:"center"});c.classList.remove("flash");void c.offsetWidth;c.classList.add("flash")}}
+function search(){var q=$("q").value.toLowerCase().trim(),r=$("res");if(!q){r.className="";r.innerHTML="";return}
+ var l=st.filter(function(a){return (a.t+" "+a.g).toLowerCase().indexOf(q)>-1}).slice(0,12);r.className="on";r.innerHTML=l.length?"":'<span class="none">Nada con ese nombre. Puedes añadirlo con «＋ Añadir».</span>';
+ l.forEach(function(a){var b=document.createElement("button");b.type="button";b.className="rt";b.style.color="inherit";b.innerHTML=(a.img?'<img src="'+a.img+'" alt="">':'<i></i>')+'<span>'+esc(a.t)+'</span><em>'+L[a.s]+'</em>';b.onclick=function(){r.className="";jump(a.id)};r.appendChild(b)})}
+$("q").oninput=search;
+document.addEventListener("click",function(e){if(!e.target.closest(".sw"))$("res").className=""});
+$("q").addEventListener("keydown",function(e){if(e.key=="Escape")$("res").className=""});
+$("sort").onchange=render;
+$("rnd").onclick=function(){var p=st.filter(function(a){return a.s=="pend"||a.s=="view"});if(!p.length){say("No te queda nada pendiente: añade algo nuevo.");return}
+ setView("home");setTab("all");var cs=p.map(function(a){return $("c-"+a.id)}).filter(Boolean),n=cs.length>1?16+Math.floor(Math.random()*6):1,i=0,last=null;
+ (function step(){if(last)last.classList.remove("hl");var c=cs[Math.floor(Math.random()*cs.length)];if(c===last&&cs.length>1)c=cs[(cs.indexOf(c)+1)%cs.length];last=c;c.classList.add("hl");c.scrollIntoView({block:"center",behavior:"auto"});
+  if(++i<n)setTimeout(step,50+i*i*1.6);else{c.classList.remove("hl");c.classList.add("win");burst(c,"当");say("Hoy toca: "+by(c.dataset.id).t);setTimeout(function(){c.classList.remove("win")},3000)}})()};
+
+/* ---- calendario (solo anime, AniList) ---- */
+function dk(d){return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()}
+function renderCal(){var b=$("vCal"),now=new Date(),t0=new Date(now.getFullYear(),now.getMonth(),now.getDate()),its=st.filter(function(a){return a.nx&&a.s!="done"&&a.s!="drop"}).sort(function(x,y){return new Date(x.nx)-new Date(y.nx)});
+ var h='<h2 class="sec">暦 · Calendario <small>próximos episodios de anime</small></h2><p class="hint">Ponle fecha al próximo episodio en «Ajustes» de cada anime. Al marcarlo como visto, se programa el de la semana siguiente. Solo se sincroniza con AniList (anime).</p>';
+ if(!its.length){b.innerHTML=h+'<div class="empty">Todavía no hay fechas. Abre un anime, entra en «Ajustes» y elige el próximo episodio.</div>';return}
+ function item(a){var n=nextEp(a),d=new Date(a.nx);return '<div class="ci" style="--h:'+hue(a.t)+'">'+(a.img?'<img src="'+a.img+'" alt="">':'<i>'+kj(a.g)+'</i>')+'<div><b>'+esc(a.t)+'</b><small>'+(n?'Ep. '+n.e+' · ':'')+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})+' · <span data-cd="'+a.nx+'"></span></small><span class="ca"><button class="lnk" data-c="seen" data-id="'+a.id+'">✓ Visto</button><button class="lnk" data-c="go" data-id="'+a.id+'">Abrir</button></span></div></div>'}
+ var days="";for(var i=0;i<7;i++){var d0=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+i),kk=dk(d0),li=its.filter(function(a){return dk(new Date(a.nx))==kk});days+='<div class="dy'+(i==0?" today":"")+'"><h3>'+d0.toLocaleDateString("es-ES",{weekday:"short",day:"numeric"})+'</h3>'+(li.map(item).join("")||'<p class="none">—</p>')+'</div>'}
+ var t7=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+7),late=its.filter(function(a){return new Date(a.nx)<t0}),far=its.filter(function(a){return new Date(a.nx)>=t7});
+ b.innerHTML=h+'<div class="cal">'+days+'</div>'+(late.length?'<h3 class="sub">Ya disponibles</h3><div class="cal2">'+late.map(item).join("")+'</div>':'')+(far.length?'<h3 class="sub">Más adelante</h3><div class="cal2">'+far.map(item).join("")+'</div>':'');updCd()}
+$("vCal").addEventListener("click",function(e){var b=e.target.closest("[data-c]");if(!b)return;var a=by(b.dataset.id);if(!a)return;if(b.dataset.c=="go"){jump(a.id);return}
+ var n=nextEp(a);if(n){a.ss[n.i].p++;sync(a)}bump(a,true);burst(b,"見");save();render()});
+
+/* ---- añadir ---- */
+function buildSe(){var k=Math.max(1,Math.min(999,parseInt($("fSe").value)||1)),Lc=$("fSeL"),g=function(c){return [].map.call(Lc.querySelectorAll(c),function(x){return x.value})},on=g(".sen"),om=g(".sem"),oz=g(".snm");Lc.innerHTML="";for(var i=0;i<k;i++){var l=document.createElement("div");l.className="sebox";l.innerHTML='<b>T'+(i+1)+'</b><label>Nombre<input class="snm" maxlength="60" placeholder="Temporada '+(i+1)+'" value="'+esc(oz[i]||"").replace(/"/g,"&quot;")+'"></label><label>Episodios<input class="sen" type="number" min="1" max="99999" value="'+(on[i]||on[on.length-1]||12)+'"></label><label>Min/ep<input class="sem" type="number" min="1" max="600" value="'+(om[i]||om[om.length-1]||$("fDu").value||24)+'"></label>';Lc.appendChild(l)}}
+$("fSe").oninput=buildSe;buildSe();$("fDu").oninput=function(){[].forEach.call($("fSeL").querySelectorAll(".sem"),function(x){x.value=$("fDu").value})};
+function openAdd(){$("addm").hidden=false;$("fT").focus()}function closeAdd(){$("addm").hidden=true}
+$("openAdd").onclick=openAdd;$("cancel").onclick=closeAdd;
+$("addm").addEventListener("click",function(e){if(e.target===$("addm"))closeAdd()});
+document.addEventListener("keydown",function(e){if(e.key=="Escape"&&!$("addm").hidden)closeAdd()});
+$("fF").onchange=function(e){var f=e.target.files[0];if(!f)return;img(f,function(u){fimg=u;$("fImg").src=u;$("fImg").style.display="block";$("fBox").style.display="none"})};
+$("go").onclick=function(){var t=$("fT").value.trim();if(!t){say("Escribe un título.");$("fT").focus();return}
+ var s=$("fS").value,ss=[],i=0;
+ [].forEach.call($("fSeL").querySelectorAll(".sebox"),function(x){
+  var n=Math.max(1,Math.min(99999,parseInt(x.querySelector(".sen").value)||1));
+  ss.push({
+   nm:x.querySelector(".snm").value.trim(),
+   n:n,
+   p:s=="done"?n:0,
+   m:Math.max(1,Math.min(600,parseInt(x.querySelector(".sem").value)||24)),
+   cover:(AUTO&&AUTO.tvCovers&&AUTO.tvCovers[i])||""
+  });
+  i++;
+ });
+ st.unshift({id:"u"+Date.now(),t:t,g:$("fG").value.trim(),d:$("fD").value.trim(),img:fimg,s:s,r:0,f:0,rv:"",tier:"",dur:Math.max(1,Math.min(600,parseInt($("fDu").value)||24)),nx:$("fNx").value,mid:(AUTO&&AUTO.id)||0,fx:50,fy:50,fz:1,ex:[],ss:ss});
+ if(!save()){st.shift();return}
+ ["fT","fG","fD","fNx"].forEach(function(ii){$(ii).value=""});$("fSe").value=1;$("fDu").value=24;$("fSeL").innerHTML="";buildSe();fimg="";AUTO=null;$("sg").innerHTML="";$("fImg").style.display="none";$("fBox").style.display="grid";$("fF").value="";
+ closeAdd();say("¡“"+t+"” añadido!");setView("home");setTab("all")};
+
+/* ---- tier list (personalizable) ---- */
+function setView(v){view=v;[].forEach.call($("menu").children,function(b){b.setAttribute("aria-pressed",b.dataset.v==v)});$("vHome").hidden=v!="home";$("vCal").hidden=v!="cal";$("tier").hidden=v!="tier";if(v=="tier")renderTier();if(v=="cal")renderCal();window.scrollTo(0,0)}
+$("menu").onclick=function(e){var b=e.target.closest("[data-v]");if(b)setView(b.dataset.v)};
+
+var delT2;
+function chip(a){var d=document.createElement("div");d.className="chip"+(sel==a.id?" sel":"");d.draggable=true;d.dataset.id=a.id;d.title=a.t+(a.rv?" — "+a.rv:"");d.style.setProperty("--h",hue(a.t));d.innerHTML=(a.img?'<img src="'+a.img+'" alt="">':'<b>'+kj(a.g)+'</b>')+'<span>'+esc(a.t)+'</span>';return d}
+function place(id,t){var a=by(id);if(!a)return;a.tier=t;sel=null;save();renderTier()}
+var TD=[{id:"S",n:"S",c:"#d7263d"},{id:"A",n:"A",c:"#e8801f"},{id:"B",n:"B",c:"#e0b020"},{id:"C",n:"C",c:"#4fa86a"},{id:"D",n:"D",c:"#3a86d0"},{id:"F",n:"F",c:"#80808a"}];
+function loadT(){try{var v=localStorage.getItem("animeteca-tiers");return v?JSON.parse(v):null}catch(e){return null}}
+function saveT(){try{localStorage.setItem("animeteca-tiers",JSON.stringify(TIERS))}catch(e){}}
+var TIERS=loadT()||JSON.parse(JSON.stringify(TD)),tedit=false,tArm=null,delT2;
+function tcol(h){var n=parseInt(h.slice(1),16);return (.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))>150?"#111":"#fff"}
+function renderTier(){var box=$("tier"),done=st.filter(function(a){return a.s=="done"}),cur=sel&&by(sel),ids=TIERS.map(function(t){return t.id});
+ box.innerHTML='<div class="th"><h2>格付け · Tier list</h2><button class="tab" data-t="edit" type="button">'+(tedit?"Listo":"✎ Personalizar")+'</button></div><p class="hint">'+(cur?"Seleccionado: "+esc(cur.t)+". Toca la fila donde quieres ponerlo.":"Arrastra tus animes completados a una fila, o toca uno y luego toca la fila. Con «Personalizar» creas tus propias categorías.")+'</p>';
+ if(tedit)box.insertAdjacentHTML("beforeend",'<div class="tnew"><input id="tnN" maxlength="24" placeholder="Nueva categoría (ej. Obra maestra)" aria-label="Nombre de categoría"><input id="tnC" type="color" value="#7a5af8" aria-label="Color"><button class="tab" data-t="add" type="button">+ Añadir</button><button class="lnk" data-t="reset" type="button">Restaurar S–F</button></div>');
+ if(!done.length){box.insertAdjacentHTML("beforeend",'<div class="empty" style="margin-top:12px">Aún no has completado ningún anime. Cuando marques uno como Completado, aparecerá aquí para clasificarlo.</div>');return}
+ [{id:"",n:"",c:""}].concat(TIERS).forEach(function(t,ix){var r=document.createElement("div");r.className="tr"+(t.id?"":" pool");r.dataset.t=t.id;var j=ix-1,lab;
+  if(!t.id)lab='<div class="tl">未<small>sin clasificar</small></div>';
+  else if(tedit)lab='<div class="tl te" style="background:'+t.c+'"><input class="tn" data-t="name" data-i="'+j+'" value="'+esc(t.n).replace(/"/g,"&quot;")+'" maxlength="24" aria-label="Nombre"><input type="color" data-t="color" data-i="'+j+'" value="'+t.c+'" aria-label="Color"><span><button data-t="up" data-i="'+j+'" aria-label="Subir">▲</button><button data-t="dn" data-i="'+j+'" aria-label="Bajar">▼</button><button data-t="del" data-i="'+j+'" aria-label="Eliminar categoría">'+(tArm==t.id?"¿Seguro?":"✕")+'</button></span></div>';
+  else lab='<div class="tl" style="background:'+t.c+';color:'+tcol(t.c)+';font-size:'+(t.n.length>9?13:t.n.length>3?17:34)+'px">'+esc(t.n)+'</div>';
+  r.innerHTML=lab+'<div class="tz"></div>';
+  done.filter(function(a){var x=a.tier||"";if(ids.indexOf(x)<0)x="";return x==t.id}).forEach(function(a){r.lastChild.appendChild(chip(a))});box.appendChild(r)})}
+
+var tr=$("tier");
+tr.addEventListener("dragstart",function(e){var c=e.target.closest(".chip");if(!c)return;e.dataTransfer.setData("text/plain",c.dataset.id);c.classList.add("drag")});
+tr.addEventListener("dragend",function(){[].forEach.call(document.querySelectorAll(".chip.drag,.tr.over"),function(x){x.classList.remove("drag","over")})});
+tr.addEventListener("dragover",function(e){var r=e.target.closest(".tr");if(r){e.preventDefault();r.classList.add("over")}});
+tr.addEventListener("dragleave",function(e){var r=e.target.closest(".tr");if(r&&!r.contains(e.relatedTarget))r.classList.remove("over")});
+tr.addEventListener("drop",function(e){var r=e.target.closest(".tr");if(!r)return;e.preventDefault();place(e.dataTransfer.getData("text/plain"),r.dataset.t)});
+tr.addEventListener("click",function(e){var b=e.target.closest("button[data-t]");
+ if(b){var k=b.dataset.t,i=+b.dataset.i;
+  if(k=="edit"){tedit=!tedit;tArm=null}
+  else if(k=="add"){var nm=$("tnN").value.trim();if(!nm){$("tnN").focus();return}TIERS.push({id:"t"+Date.now(),n:nm,c:$("tnC").value});saveT()}
+  else if(k=="reset"){TIERS=JSON.parse(JSON.stringify(TD));saveT()}
+  else if(k=="up"&&i>0){var t1=TIERS.splice(i,1)[0];TIERS.splice(i-1,0,t1);saveT()}
+  else if(k=="dn"&&i<TIERS.length-1){var t2=TIERS.splice(i,1)[0];TIERS.splice(i+1,0,t2);saveT()}
+  else if(k=="del"){var id=TIERS[i].id;if(tArm!=id){tArm=id;clearTimeout(delT2);delT2=setTimeout(function(){tArm=null;renderTier()},3000)}else{TIERS.splice(i,1);tArm=null;saveT()}}
+  renderTier();return}
+ if(e.target.closest("input"))return;
+ var c=e.target.closest(".chip"),r=e.target.closest(".tr");if(c){sel=sel==c.dataset.id?null:c.dataset.id;renderTier();return}if(r&&sel)place(sel,r.dataset.t)});
+tr.addEventListener("change",function(e){var t=e.target,k=t.dataset.t,i=+t.dataset.i;if(k=="name"){TIERS[i].n=t.value.trim()||TIERS[i].n;saveT();renderTier()}else if(k=="color"){TIERS[i].c=t.value;saveT();renderTier()}});
+tr.addEventListener("keydown",function(e){if(e.key=="Enter"&&e.target.id=="tnN"){e.preventDefault();tr.querySelector("[data-t=add]").click()}});
+
+$("theme").onclick=function(){var r=document.documentElement,d=r.dataset.theme?r.dataset.theme=="dark":!matchMedia("(prefers-color-scheme:light)").matches;r.dataset.theme=d?"light":"dark"};
+
+/* ---- efectos de ratón ---- */
+var bg=$("bg"),idle=0,last=0;
+function move(x,y){bg.style.setProperty("--mx",x+"px");bg.style.setProperty("--my",y+"px");bg.style.setProperty("--px",(x/innerWidth-.5)*2);bg.style.setProperty("--py",(y/innerHeight-.5)*2)}
+move(innerWidth*.7,innerHeight*.3);
+document.addEventListener("pointermove",function(e){idle=Date.now();move(e.clientX,e.clientY);
+ if(e.pointerType=="mouse"&&e.timeStamp-last>45){last=e.timeStamp;var d=document.createElement("span");d.className="dot";d.style.left=e.clientX+"px";d.style.top=e.clientY+"px";document.body.appendChild(d);setTimeout(function(){d.remove()},700)}});
+document.addEventListener("pointerdown",function(e){if(e.target.closest("input,select,textarea,button,summary,.ep,.next,.chip,.tr,.modal"))return;
+ var b=document.createElement("div");b.className="bst";b.style.left=e.clientX+"px";b.style.top=e.clientY+"px";document.body.appendChild(b);
+ var s=document.createElement("span");s.className="sfx2";s.textContent=["ドン","ゴゴゴ","バッ","ズバッ","ドドド"][Math.floor(Math.random()*5)];s.style.left=(e.clientX+20)+"px";s.style.top=(e.clientY-40)+"px";document.body.appendChild(s);
+ setTimeout(function(){b.remove();s.remove()},900)});
+if(!matchMedia("(prefers-reduced-motion:reduce)").matches)(function wander(){if(Date.now()-idle>3000){var t=Date.now()/2400;move(innerWidth*(.5+.38*Math.sin(t)),innerHeight*(.5+.32*Math.sin(t*1.3+1)))}requestAnimationFrame(wander)})();
+
+/* ---- fondo: MOSAICO FIJO DE 8 COLUMNAS ---- */
+var BGP=[];try{BGP=JSON.parse(localStorage.getItem("animeteca-bg")||"[]")}catch(e){}
+function applyBg(){
+  [].forEach.call(document.querySelectorAll("#bg .lay"),function(l){
+    var o=l.querySelector(".pics"); if(o) o.remove();
+    var sv=l.querySelector("svg");
+    sv.style.display = BGP.length ? "none" : "";
+    if(BGP.length){
+      var d=document.createElement("div");
+      d.className="pics";
+      var n = 8;
+      var h="";
+      for(var i=0;i<n;i++){
+        var u = BGP[i % BGP.length];
+        h += '<img src="'+u+'" alt="">';
+      }
+      d.innerHTML=h;
+      l.insertBefore(d,sv);
+    }
+  });
+}
+function saveBg(){try{localStorage.setItem("animeteca-bg",JSON.stringify(BGP))}catch(e){BGP.pop();say("No cabe otra foto: quita alguna o usa una más pequeña.")}applyBg();drawBgm()}
+function drawBgm(){$("bgT").innerHTML=BGP.map(function(u,i){return '<span class="bgt"><img src="'+u+'" alt=""><button data-bx="'+i+'" aria-label="Quitar foto">✕</button></span>'}).join("")||'<span class="none">Ahora mismo se ven las páginas dibujadas.</span>'}
+function imgW(file,w,q,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,w/im.width),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",q))};im.src=r.result};r.readAsDataURL(file)}
+$("bgBtn").onclick=function(){drawBgm();$("bgm").hidden=false};
+$("bgX").onclick=function(){$("bgm").hidden=true};
+$("bgm").addEventListener("click",function(e){if(e.target===$("bgm"))$("bgm").hidden=true});
+document.addEventListener("keydown",function(e){if(e.key=="Escape")$("bgm").hidden=true});
+$("bgF").onchange=function(e){var fs=[].slice.call(e.target.files).slice(0,60),k=fs.length;if(!k)return;fs.forEach(function(f){imgW(f,960,.55,function(u){BGP.push(u);if(!--k)saveBg()})});e.target.value=""};
+$("bgT").onclick=function(e){var b=e.target.closest("[data-bx]");if(b){BGP.splice(+b.dataset.bx,1);saveBg()}};
+$("bgOff").onclick=function(){BGP=[];saveBg()};
+var vv=null;try{vv=localStorage.getItem("animeteca-bgv")}catch(e){}
+if(vv){$("bgV").value=vv;$("bg").style.setProperty("--veil",vv+"%")}
+$("bgV").oninput=function(){$("bg").style.setProperty("--veil",this.value+"%")};
+$("bgV").onchange=function(){try{localStorage.setItem("animeteca-bgv",this.value)}catch(e){}};
+var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(BGP.length)applyBg()},250)});
+/* ================= v4.4 ================= */
+var AL="https://graphql.anilist.co",AUTO=null,sgT;
+function gql(q,v){return fetch(AL,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:q,variables:v||{}})}).then(function(r){return r.json()}).then(function(j){if(j.errors||!j.data)throw new Error("gql");return j.data})}
+var GES={Action:"Acción",Adventure:"Aventura",Comedy:"Comedia",Drama:"Drama",Fantasy:"Fantasía",Horror:"Terror",Mystery:"Misterio",Romance:"Romance","Sci-Fi":"Ciencia ficción","Slice of Life":"Slice of life",Sports:"Deportes",Supernatural:"Sobrenatural",Thriller:"Thriller",Psychological:"Psicológico",Music:"Música",Mecha:"Mecha","Mahou Shoujo":"Mahō shōjo",Ecchi:"Ecchi"};
+function ttl(m){return m.title.english||m.title.romaji}
+function clean(t){return (t||"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").replace(/\n{3,}/g,"\n\n").trim()}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+
+/* ---- autocompletado con datos reales + FICHA UNIFICADA CON PORTADAS ---- */
+var SQ='query($s:String){Page(perPage:6){media(search:$s,type:ANIME,sort:SEARCH_MATCH){id title{romaji english}format episodes coverImage{large}}}}';
+var CQ='query($id:Int){Media(id:$id){id title{romaji english}format episodes duration status genres description(asHtml:false) coverImage{extraLarge} nextAiringEpisode{airingAt episode} relations{edges{relationType node{id format}}}}}';
+$("fT").addEventListener("input",function(){clearTimeout(sgT);AUTO=null;var q=this.value.trim(),b=$("sg");if(q.length<3){b.innerHTML="";return}
+ sgT=setTimeout(function(){gql(SQ,{s:q}).then(function(d){b.innerHTML="";d.Page.media.forEach(function(m){var r=document.createElement("button");r.type="button";r.className="rt sgi";r.innerHTML='<img src="'+m.coverImage.large+'" alt=""><span>'+esc(ttl(m))+'</span><em>'+(m.format||"")+' · '+(m.episodes||"?")+' ep.</em>';r.onclick=function(){pick(m)};b.appendChild(r)})}).catch(function(){b.innerHTML='<span class="none">Sin conexión con la base de datos: puedes rellenarlo a mano.</span>'})},350)});
+async function rel(id,t){var f=(await gql(CQ,{id:id})).Media,n=null;f.relations.edges.forEach(function(e){if(!n&&e.relationType==t&&(e.node.format=="TV"||e.node.format=="ONA"||e.node.format=="MOVIE"||e.node.format=="OVA"||e.node.format=="SPECIAL"))n=e.node});return [f,n]}
+async function chain(m){
+ var cur=m.id,i,r,out=[],sn={};
+ for(i=0;i<20;i++){r=await rel(cur,"PREQUEL");if(!r[1]||r[1].format==="MOVIE"||r[1].format==="OVA")break;cur=r[1].id}
+ var allMedia={};
+ for(i=0;i<60&&cur&&!sn[cur];i++){
+  sn[cur]=1;
+  r=await rel(cur,"SEQUEL");
+  var data=await gql(CQ,{id:cur});
+  var node=data.Media;
+  if(node.format==="TV"||node.format==="ONA"||node.format==="OVA"||node.format==="MOVIE"||node.format==="SPECIAL"){
+   allMedia[node.id]=node;
+  }
+  if(r[1]&&(r[1].format==="TV"||r[1].format==="ONA")){
+   cur=r[1].id;
+  } else if(r[1]&&(r[1].format==="MOVIE"||r[1].format==="OVA"||r[1].format==="SPECIAL")){
+   var exData=await gql(CQ,{id:r[1].id});
+   allMedia[exData.Media.id]=exData.Media;
+   var r2=await rel(r[1].id,"SEQUEL");
+   if(r2[1]&&(r2[1].format==="TV"||r2[1].format==="ONA")){cur=r2[1].id}else break;
+  } else break;
+  await sleep(300);
+ }
+ var arr=Object.values(allMedia).sort(function(a,b){return a.id-b.id});
+ return arr;
+}
+async function pick(m){$("sg").innerHTML='<span class="none">Cargando franquicia completa…</span>';var ms;try{ms=await chain(m)}catch(e){ms=null}
+ if(!ms||!ms.length){$("sg").innerHTML='<span class="none">No pude cargar los datos.</span>';return}
+ var f=ms[0];
+ var tv=ms.filter(function(x){return x.format==="TV"||x.format==="ONA"});
+ var extras=ms.filter(function(x){return x.format==="MOVIE"||x.format==="OVA"||x.format==="SPECIAL"});
+
+ $("fT").value=ttl(f);
+ $("fG").value=(f.genres||[]).slice(0,3).map(function(g){return GES[g]||g}).join(" · ");
+ $("fD").value=clean(f.description);
+ fimg=f.coverImage.extraLarge;$("fImg").src=fimg;$("fImg").style.display="block";$("fBox").style.display="none";
+ $("fDu").value=f.duration||24;
+
+ $("fSe").value=Math.max(1,tv.length);
+ $("fSeL").innerHTML="";
+ buildSe();
+ var bx=$("fSeL").querySelectorAll(".sebox");
+ tv.forEach(function(x,i){
+  bx[i].querySelector(".sen").value=x.episodes||(x.nextAiringEpisode?Math.max(12,x.nextAiringEpisode.episode):12);
+  bx[i].querySelector(".sem").value=x.duration||24;
+  bx[i].querySelector(".snm").value=ttl(x);
+ });
+ AUTO={id:f.id,extras:extras,tvCovers:tv.map(function(x){return x.coverImage.extraLarge})};
+
+ if(ms[ms.length-1].nextAiringEpisode)$("fNx").value=toLocal(new Date(ms[ms.length-1].nextAiringEpisode.airingAt*1000));
+
+ $("sg").innerHTML="";
+ say("Cargadas "+tv.length+" temporada(s) y "+extras.length+" extra(s). Revisa y pulsa Añadir.");
+}
+
+/* ---- calendario que se actualiza solo + renovaciones ---- */
+var NQ='query($id:Int,$s:String){Media(id:$id,search:$s,type:ANIME){id status nextAiringEpisode{airingAt episode} relations{edges{relationType node{id title{romaji english} format status startDate{year month day}}}}}}';
+async function syncOne(a){var d=(await gql(NQ,a.mid?{id:a.mid}:{s:a.t})).Media;if(!d)return;a.mid=d.id;
+ if(a.s!="done"){if(d.nextAiringEpisode){a.nx=toLocal(new Date(d.nextAiringEpisode.airingAt*1000));var n=d.nextAiringEpisode.episode-1,L=a.ss[a.ss.length-1];if(L&&n>L.n)L.n=n}else if(d.status=="FINISHED")a.nx=""}
+ a.rn=d.relations.edges.filter(function(e){return e.relationType=="SEQUEL"&&(e.node.status=="NOT_YET_RELEASED"||e.node.status=="RELEASING")}).map(function(e){var sd=e.node.startDate||{};return {t:ttl(e.node),s:e.node.status,d:sd.year?[sd.day,sd.month,sd.year].filter(Boolean).join("/"):""}});a.sy=Date.now()}
+var syncing=false;
+async function syncCal(force){if(syncing)return;var l=st.filter(function(a){return a.s!="drop"&&(force||!a.sy||Date.now()-a.sy>216e5)});if(!l.length)return;syncing=true;var ok=0;
+ for(var i=0;i<l.length;i++){try{await syncOne(l[i]);ok++}catch(e){}await sleep(800)}
+ syncing=false;save();render();if(force)say(ok?"Calendario actualizado: "+ok+" anime(s).":"Sin conexión: no pude actualizar.")}
+var rc0=renderCal;renderCal=function(){rc0();var h='<div class="sync"><button class="cta" data-c="sync" type="button">⟳ Actualizar calendario</button> <small class="none">Fechas y renovaciones desde AniList (solo anime) · se refresca solo cada 6 h</small></div>',rn=[];
+ st.forEach(function(a){(a.rn||[]).forEach(function(r){rn.push([a,r])})});
+ if(rn.length)h+='<h3 class="sub">Renovaciones anunciadas</h3><div class="cal2">'+rn.map(function(x){var a=x[0],r=x[1];return '<div class="ci" style="--h:'+hue(a.t)+'"><i>新</i><div><b>'+esc(r.t)+'</b><small>'+esc(a.t)+' · '+(r.s=="RELEASING"?"En emisión":"Anunciada")+(r.d?" · "+r.d:"")+'</small></div></div>'}).join("")+'</div>';
+ $("vCal").insertAdjacentHTML("beforeend",h)};
+$("vCal").addEventListener("click",function(e){var b=e.target.closest("[data-c=sync]");if(b){say("Consultando…");syncCal(true)}});
+
+/* ---- botón rápido: ponerse al día ---- */
+var cuA=null;
+function cuCalc(){var a=cuA;if(!a)return;var left=mins(a,1)-mins(a),h=+$("cuH").value,d=Math.ceil(left/60/h),end=new Date(Date.now()+d*864e5);$("cuHv").textContent=h+" h";
+ $("cuS").textContent=left<=0?"¡Ya estás al día!":"Te faltan "+(tot(a)-seen(a))+" episodios · "+fmt(left)+" en total";
+ $("cuR").innerHTML=left<=0?"":'A '+h+' h al día terminas en <b>'+d+(d>1?" días":" día")+'</b> (el '+end.toLocaleDateString("es-ES",{day:"numeric",month:"long"})+').<br><small class="none">Maratón seguido: '+fmt(left)+'</small>';$("cuP").hidden=!nextEp(a)}
+function openCu(a){cuA=a;$("cuT").textContent=a.t;cuCalc();$("cum").hidden=false}
+$("cuH").oninput=cuCalc;$("cuX").onclick=function(){$("cum").hidden=true};
+$("cum").addEventListener("click",function(e){if(e.target===$("cum"))$("cum").hidden=true});
+$("cuP").onclick=function(){var n=nextEp(cuA);if(n){cuA.ss[n.i].p++;sync(cuA);bump(cuA);save();render();cuCalc()}};
+
+/* ---- chatbot con personaje de tus favoritos + GROQ + CREAR ANIMES ---- */
+var BOTK=KEY+"-bot",BOT=null,GK="",HIST=[];
+try{BOT=JSON.parse(localStorage.getItem(BOTK)||"null");GK=localStorage.getItem("animeteca-groq-key")||""}catch(e){}
+function favs(){return st.filter(function(a){return a.f})}
+function addM(w,t){var m=document.createElement("div");m.className="m "+w;m.innerHTML=t;$("cpM").appendChild(m);$("cpM").scrollTop=1e9}
+function drawBot(){var on=!!BOT;$("cpN").textContent=on?BOT.n:"Chatbot";$("cpS").textContent=on?"de «"+BOT.a+"»":(GK?"IA de Groq activa":"Elige un personaje");$("cpI").hidden=!(on&&BOT.img);if(on&&BOT.img){$("cpI").src=BOT.img;$("botA").innerHTML='<img src="'+BOT.img+'" alt="">'}else $("botA").textContent="💬"}
+function setBot(o){BOT=o;try{localStorage.setItem(BOTK,JSON.stringify(o))}catch(e){}HIST=[];$("cpP").hidden=true;$("cpM").hidden=false;$("cpM").innerHTML="";drawBot();addM("b","¡Hola! Soy <b>"+esc(o.n)+"</b>"+(GK?" y tengo <b>IA de Groq</b> activa.":" (modo local, sin IA).")+" Conozco tu estantería y tus favoritos: pídeme recomendaciones, cuánto te falta de un anime o qué se estrena esta semana.")}
+function pickBot(){var P=$("cpP"),F=favs();P.hidden=false;$("cpM").hidden=true;
+ P.innerHTML='<h4>Elige tu personaje</h4>'+(F.length?'<p class="hint">Primero, de qué favorito:</p><div class="pk">'+F.map(function(a){return '<button class="tab" type="button" data-an="'+a.id+'">'+esc(a.t)+'</button>'}).join("")+'</div><div id="cpC2"></div>':'<p class="hint">Marca animes con ♥ en tu estantería y vuelve aquí para elegir uno de sus personajes.</p>')+
+ '<details open><summary>Personaje propio (nombre + foto)</summary><input id="bcN" placeholder="Nombre"><input id="bcU" placeholder="URL de imagen (o sube una)"><input id="bcF" type="file" accept="image/*"><button class="cta" id="bcOk" type="button">Usar</button></details>'+
+ '<details><summary>IA real con Groq (opcional)</summary><p class="hint">Pega tu API key de Groq (gratis en console.groq.com). Se guarda solo en este navegador. Sin clave, el bot responde con reglas locales.</p><input id="cpK" type="password" value="'+esc(GK)+'" placeholder="gsk_…"><button class="tab" id="cpKs" type="button">Guardar</button> <button class="lnk" id="cpKx" type="button">Borrar</button></details>'+(BOT?'<button class="lnk" id="cpBk" type="button">← Volver al chat</button>':'')}
+var CH=[],bcImg="";
+$("cpP").addEventListener("click",async function(e){var b=e.target.closest("[data-an]");
+ if(b){var a=by(b.dataset.an),z=$("cpC2");z.innerHTML='<span class="none">Buscando personajes…</span>';try{var d=await gql('query($s:String,$id:Int){Media(search:$s,id:$id,type:ANIME){characters(sort:ROLE,perPage:12){nodes{name{full} image{large}}}}}',a.mid?{id:a.mid}:{s:a.t});CH=d.Media.characters.nodes.map(function(c){return {n:c.name.full,img:c.image.large,a:a.t}});z.innerHTML='<div class="chg">'+CH.map(function(c,i){return '<button type="button" data-ch="'+i+'"><img src="'+c.img+'" alt=""><span>'+esc(c.n)+'</span></button>'}).join("")+'</div>'}catch(x){z.innerHTML='<span class="none">No pude cargar personajes (¿sin conexión?). Usa «Personaje propio».</span>'}return}
+ b=e.target.closest("[data-ch]");if(b){setBot(CH[+b.dataset.ch]);return}
+ if(e.target.id=="bcOk"){var n=$("bcN").value.trim();if(!n){$("bcN").focus();return}setBot({n:n,img:bcImg||$("bcU").value.trim(),a:(favs()[0]||{t:"tus animes"}).t});return}
+ if(e.target.id=="cpKs"){GK=$("cpK").value.trim();try{localStorage.setItem("animeteca-groq-key",GK)}catch(x){}say(GK?"Clave de Groq guardada.":"Clave borrada.");drawBot();return}
+ if(e.target.id=="cpKx"){GK="";try{localStorage.removeItem("animeteca-groq-key")}catch(x){}if($("cpK"))$("cpK").value="";say("Clave borrada.");drawBot();return}
+ if(e.target.id=="cpBk"){$("cpP").hidden=true;$("cpM").hidden=false}});
+$("cpP").addEventListener("change",function(e){if(e.target.id=="bcF"&&e.target.files[0])img(e.target.files[0],function(u){bcImg=u;say("Foto lista.")})});
+$("bot").onclick=function(){var p=$("cp");p.hidden=!p.hidden;if(!p.hidden){drawBot();if(!BOT)pickBot();else $("cpQ").focus()}};
+$("cpX").onclick=function(){$("cp").hidden=true};$("cpC").onclick=pickBot;
+function findA(q){q=q.toLowerCase();return st.filter(function(a){var t=a.t.toLowerCase();return q.indexOf(t)>-1||t.split(/[\s:!×]+/).some(function(w){return w.length>4&&q.indexOf(w)>-1})})[0]}
+async function local(q){var l=q.toLowerCase(),a=findA(q),F=favs(),ops=["¡Déjamelo a mí! ","Mmm, interesante. ","¡Allá voy! ","Vale, vale. "],o=ops[Math.floor(Math.random()*ops.length)];
+ if(/^(hola|buenas|hey|ey|qué tal)/.test(l))return "¡Hola! ¿Qué te apetece hoy: recomendación, calendario o cuánto te falta de algo?";
+ if(/tard|al día|cu[aá]nto (me )?(falta|queda)|marat/.test(l)){if(!a)return "¿De qué anime? Dime el título.";var m=mins(a,1)-mins(a);return m<=0?"«"+esc(a.t)+"» ya lo tienes terminado.":o+"Te faltan "+(tot(a)-seen(a))+" episodios de «"+esc(a.t)+"»: "+fmt(m)+". A 2 h/día, "+Math.ceil(m/120)+" días."}
+ if(/recomi|suger|qu[eé] veo|algo nuevo|parecid/.test(l)){var s=a||F[Math.floor(Math.random()*F.length)];if(!s)return "Marca algún favorito ♥ y te recomiendo cosas parecidas.";
+  try{var d=await gql('query($s:String,$id:Int){Media(search:$s,id:$id,type:ANIME){recommendations(perPage:8,sort:RATING_DESC){nodes{mediaRecommendation{title{romaji english} averageScore}}}}}',s.mid?{id:s.mid}:{s:s.t});var r=d.Media.recommendations.nodes.map(function(n){return n.mediaRecommendation}).filter(function(m){return m&&!st.some(function(x){return x.t.toLowerCase()==ttl(m).toLowerCase()})}).slice(0,4);return o+"Si te gusta «"+esc(s.t)+"», prueba: "+r.map(function(m){return "<b>"+esc(ttl(m))+"</b>"+(m.averageScore?" ("+m.averageScore/10+"/10)":"")}).join(", ")+"."}
+  catch(e){var p=st.filter(function(x){return x.s=="pend"})[0];return p?"Sin conexión, pero tienes pendiente «"+esc(p.t)+"». ¡Empieza hoy!":"Sin conexión no puedo buscar recomendaciones nuevas."}}
+ if(/cu[aá]ndo|calendario|pr[oó]xim|esta semana|estren/.test(l)){var n=st.filter(function(x){return x.nx&&x.s!="done"&&x.s!="drop"}).sort(function(x,y){return new Date(x.nx)-new Date(y.nx)}).slice(0,5);return n.length?"Lo próximo: "+n.map(function(x){return "<b>"+esc(x.t)+"</b> ("+cdTxt(x.nx)+")"}).join(" · "):"No hay fechas aún. Pulsa «Actualizar calendario»."}
+ if(/favorit/.test(l))return F.length?"Tus favoritos: "+F.map(function(x){return esc(x.t)}).join(", ")+".":"Todavía no has marcado favoritos ♥.";
+ if(/estad|resumen|horas|cu[aá]nto he visto/.test(l)){var h=st.reduce(function(z,x){return z+mins(x)},0);return "Tienes "+st.length+" animes, "+st.filter(function(x){return x.s=="done"}).length+" completados y llevas "+fmt(h)+" vistos."}
+ if(a)return "«"+esc(a.t)+"»: "+seen(a)+"/"+tot(a)+" episodios"+(a.r?", tu nota "+a.r+"/10":"")+". "+esc((a.d||"").slice(0,220));
+ return "No te he entendido del todo. Prueba: «recomiéndame algo», «¿cuánto me falta de Death Note?», «¿qué se estrena?» o «mis favoritos»."}
+
+function historialParaIA(){
+ return HIST.slice(-8).map(function(m){
+  return (m.role==="user"?"Usuario: ":"Agente: ")+m.content;
+ }).join("\n");
+}
+function extraerJson(texto){
+ if(!texto) return null;
+ var limpio = texto.replace(/```json\s*/gi,"").replace(/```/g,"").trim();
+ try{ return JSON.parse(limpio); }catch(e){}
+ var ini = limpio.indexOf("{");
+ if(ini===-1) return null;
+ var dep=0, fin=-1;
+ for(var i=ini;i<limpio.length;i++){
+  if(limpio[i]==="{") dep++;
+  else if(limpio[i]==="}"){ dep--; if(dep===0){ fin=i; break; } }
+ }
+ if(fin===-1) return null;
+ try{ return JSON.parse(limpio.slice(ini,fin+1)); }catch(e){ return null; }
+}
+function normalizarAnime(obj){
+ if(!obj || typeof obj!=="object") return null;
+ var titulo = obj.titulo||obj.title||obj.nombre||obj.name;
+ if(!titulo) return null;
+ var temps = obj.temporadas||obj.seasons||obj.temporada||obj.season;
+ var arr = [];
+ if(Array.isArray(temps)) arr = temps;
+ else if(temps && typeof temps==="object") arr = [temps];
+ else arr = [{episodios: obj.episodios||obj.episodes||12, minutos: obj.minutos||obj.minutes||24}];
+ if(!arr.length) arr = [{episodios:12,minutos:24}];
+ var ss = arr.map(function(t){
+  return {
+   nm: "",
+   n: Math.max(1, Math.min(99999, parseInt(t.episodios||t.episodes||t.n)||12)),
+   p: 0,
+   m: Math.max(1, Math.min(600, parseInt(t.minutos||t.minutes||t.m)||24)),
+   cover: ""
+  };
+ });
+ return {
+  t: String(titulo).slice(0,80),
+  g: String(obj.genero||obj.genre||"Sin género").slice(0,30),
+  d: String(obj.sinopsis||obj.synopsis||"").slice(0,300),
+  ss: ss
+ };
+}
+function addAnimeFromIA(texto){
+ var obj = extraerJson(texto);
+ var norm = normalizarAnime(obj);
+ if(!norm) return false;
+ var id = "ai"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
+ st.unshift({
+  id:id, t:norm.t, g:norm.g, d:norm.d, img:"",
+  s:"pend", r:0, f:0, rv:"", tier:"",
+  dur:norm.ss[0].m, nx:"", fx:50, fy:50, fz:1, ex:[], ss:norm.ss
+ });
+ if(!save()){ st.shift(); return false; }
+ render();
+ addM("b","✅ Añadido «<b>"+esc(norm.t)+"</b>» ("+norm.ss.length+" temporada/s). Revísalo en tu estantería.");
+ return true;
+}
+
+async function groq(q){
+ if(!GK) throw new Error("sin-clave");
+ var forzarJson = /\b(crea|cree|crear|añade|anade|añadir|genera|generar|inventa|inventar|hazme)\b/i.test(q) &&
+                  /\b(anime|serie|temporada|episodio)\b/i.test(q);
+
+ var sys = "Eres "+(BOT?BOT.n:"un asistente")+", personaje de «"+(BOT?BOT.a:"anime")+"». "+
+  "Habla SIEMPRE como ese personaje, en español, con 1–4 frases. Eres el asistente de Animeteca. "+
+  "Favoritos del usuario: "+favs().map(function(a){return a.t}).join(", ")+". "+
+  "Su estantería: "+st.slice(0,40).map(function(a){return a.t+" ("+seen(a)+"/"+tot(a)+", "+L[a.s]+")"}).join("; ")+".";
+
+ if(forzarJson){
+  sys += " El usuario quiere CREAR una serie. Devuelve EXCLUSIVAMENTE un JSON válido, sin markdown ni texto alrededor, con esta forma exacta: "+
+   '{"titulo":"...","genero":"...","temporadas":[{"episodios":12,"minutos":24}],"sinopsis":"..."}';
+ }
+
+ var user = forzarJson
+  ? "Petición: "+q
+  : (historialParaIA() ? "Conversación previa:\n"+historialParaIA()+"\n\n" : "")+"Pregunta actual: "+q;
+
+ var body = {
+  model:"openai/gpt-oss-120b",
+  messages:[{role:"system",content:sys},{role:"user",content:user}],
+  temperature: forzarJson ? 0.3 : 0.8
+ };
+ if(forzarJson) body.response_format = { type: "json_object" };
+
+ var r = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+  method:"POST",
+  headers:{"Content-Type":"application/json","Authorization":"Bearer "+GK},
+  body:JSON.stringify(body)
+ });
+ if(!r.ok){var e=await r.text();throw new Error("groq "+r.status+": "+e.slice(0,200))}
+ var j = await r.json();
+ var t = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+ if(!t) throw new Error("groq vacío");
+
+ if(forzarJson) return t;
+ HIST.push({role:"assistant",content:t});
+ return esc(t);
+}
+
+$("cpF").addEventListener("submit",async function(e){
+ e.preventDefault();
+ var q=$("cpQ").value.trim(); if(!q) return;
+ if(!BOT){ pickBot(); return; }
+ $("cpQ").value="";
+ addM("u",esc(q));
+
+ var forzarJson = /\b(crea|cree|crear|añade|anade|añadir|genera|generar|inventa|inventar|hazme)\b/i.test(q) &&
+                  /\b(anime|serie|temporada|episodio)\b/i.test(q);
+
+ try{
+  if(GK){
+   var resp = await groq(q);
+   if(forzarJson){
+    if(!addAnimeFromIA(resp)){
+     addM("b","❌ La IA no devolvió un JSON válido. Respuesta:\n\n"+esc(resp.slice(0,400)));
+    }
+    return;
+   }
+   addM("b",resp);
+  } else {
+   addM("b",await local(q));
+  }
+ }catch(x){
+  if(x.message==="sin-clave"){
+   addM("b",await local(q)+"<br><br><small class='none'>💡 Añade tu clave de Groq en ⚙ Personaje → «IA real con Groq».</small>");
+  } else {
+   addM("b",await local(q)+"<br><br><small class='none'>⚠️ Error de Groq: "+esc(x.message)+"</small>");
+  }
+ }
+});
+drawBot();
+document.addEventListener("keydown",function(e){if(e.key=="Escape"){$("cum").hidden=true;$("cp").hidden=true}});
+
+applyBg();
+render();
+syncCal();
+})();
+</script>
+</body>
+</html>
